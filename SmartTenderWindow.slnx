@@ -1,4 +1,5 @@
 <Solution>
   <Project Path="SmartTenderWindow.Windows/SmartTenderWindow.Windows.csproj" Id="a69da939-8d1e-421f-8742-a0924523890c" />
   <Project Path="SmartTenderWindow\SmartTenderWindow.csproj" Id="52b57875-4d3b-4ed5-9cf9-a3b4ba480315" />
+  <Project Path="SmartTenderWindow.Tests/SmartTenderWindow.Tests.csproj" Id="d1e2f3a4-b5c6-7d8e-9f0a-1b2c3d4e5f6a" />
 </Solution>

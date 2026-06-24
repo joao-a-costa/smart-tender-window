@@ -3,3 +3,5 @@
 /SmartTenderWindow/obj
 /SmartTenderWindow.Windows/bin
 /SmartTenderWindow.Windows/obj
+/SmartTenderWindow.Tests/bin
+/SmartTenderWindow.Tests/obj

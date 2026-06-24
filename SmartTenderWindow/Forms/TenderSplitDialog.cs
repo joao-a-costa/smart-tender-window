@@ -111,9 +111,6 @@ namespace SmartTenderWindowTenderSplit.Forms
                     Anchor    = AnchorStyles.Top | AnchorStyles.Right
                 };
 
-                row.Paint += (s, e) =>
-                    e.Graphics.DrawLine(Pens.LightGray, 0, row.Height - 1, row.Width, row.Height - 1);
-
                 row.Click     += (s, e) => SelectTender(idx);
                 lblName.Click += (s, e) => SelectTender(idx);
                 lblAmt.Click  += (s, e) => SelectTender(idx);
