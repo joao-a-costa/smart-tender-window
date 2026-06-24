@@ -26,6 +26,10 @@ namespace SmartTenderWindowTenderSplit.Forms
         private Panel[] _tenderRows;
         private Label[] _tenderAmountLabels;
 
+        // Per-tender extra details captured via popups. Holds a BankTransferDetails,
+        // CheckDetails or CreditNoteRefundDetails, or null when none / not applicable.
+        private readonly object[] _details;
+
         public TenderSplitResult Result { get; private set; }
 
         // ── Constructor ──────────────────────────────────────────────────────
@@ -42,6 +46,7 @@ namespace SmartTenderWindowTenderSplit.Forms
 
             _documentTotal = documentTotal;
             _amounts       = new decimal[_tenders.Count];
+            _details       = new object[_tenders.Count];
             for (int i = 0; i < _tenders.Count; i++)
                 _amounts[i] = _tenders[i].PreloadedAmount;
 
@@ -149,6 +154,9 @@ namespace SmartTenderWindowTenderSplit.Forms
                     c.BackColor = bg;
             }
 
+            if (btnDetails != null)
+                btnDetails.Visible = RequiresPopup(_tenders[index].TenderType);
+
             // Scroll selected row into view
             int rowY   = index * 38;
             int scrollY = -panelList.AutoScrollPosition.Y;
@@ -190,25 +198,89 @@ namespace SmartTenderWindowTenderSplit.Forms
         private void CommitBuffer()
         {
             if (!long.TryParse(_inputBuffer, out long raw)) raw = 0;
-            decimal value = raw / 100m;
+            SetAmount(_selectedIndex, raw / 100m);
+            UpdateSummary();
+        }
 
-            var tender = _tenders[_selectedIndex];
+        /// <summary>
+        /// Applies <paramref name="value"/> to a tender, enforcing the MaxAmount cap and
+        /// (for non-change tenders) the document-total cap, then refreshes the row label
+        /// and the input buffer. Shared by numpad input and the detail popups.
+        /// </summary>
+        private void SetAmount(int index, decimal value)
+        {
+            var tender = _tenders[index];
 
             if (tender.MaxAmount.HasValue && value > tender.MaxAmount.Value)
-            {
                 value = tender.MaxAmount.Value;
-                _inputBuffer = AmountToBuffer(value);
-            }
 
             if (!tender.AllowsChange && value > _documentTotal)
-            {
                 value = _documentTotal;
+
+            _amounts[index] = value;
+            _tenderAmountLabels[index].Text = FormatCurrency(value);
+            if (index == _selectedIndex)
                 _inputBuffer = AmountToBuffer(value);
+        }
+
+        // ── Detail popups ─────────────────────────────────────────────────────
+
+        /// <summary>Tender types that require an extra data popup before confirming.</summary>
+        private static bool RequiresPopup(TenderTypeEnum? type)
+            => type == TenderTypeEnum.tndBankWireTransfer
+            || type == TenderTypeEnum.tndCheck
+            || type == TenderTypeEnum.tndVoucher;
+
+        private void OpenDetailsForSelected()
+        {
+            int i = _selectedIndex;
+            var tender = _tenders[i];
+
+            switch (tender.TenderType)
+            {
+                case TenderTypeEnum.tndBankWireTransfer:
+                {
+                    var d = BankTransferDialog.Show(this, tender, (BankTransferDetails)_details[i]);
+                    if (d == null) ClearTender(i);
+                    else _details[i] = d;
+                    break;
+                }
+                case TenderTypeEnum.tndCheck:
+                {
+                    var d = CheckDialog.Show(this, tender, _amounts[i], (CheckDetails)_details[i]);
+                    if (d == null) ClearTender(i);
+                    else { _details[i] = d; SetAmount(i, d.CheckAmount); }
+                    break;
+                }
+                case TenderTypeEnum.tndVoucher:
+                {
+                    var d = CreditNoteRefundDialog.Show(this, tender, _amounts[i], (CreditNoteRefundDetails)_details[i]);
+                    if (d == null) ClearTender(i);
+                    else { _details[i] = d; SetAmount(i, d.SpentValueAmount); }
+                    break;
+                }
             }
 
-            _amounts[_selectedIndex] = value;
-            _tenderAmountLabels[_selectedIndex].Text = FormatCurrency(value);
             UpdateSummary();
+        }
+
+        /// <summary>Cancelling a popup clears the line: amount reset to zero and details dropped.</summary>
+        private void ClearTender(int index)
+        {
+            _details[index] = null;
+            SetAmount(index, 0m);
+        }
+
+        /// <summary>
+        /// Index of the first allocated tender that requires a popup but has no details yet,
+        /// or -1 when all required details are present.
+        /// </summary>
+        private int FirstMissingDetailIndex()
+        {
+            for (int i = 0; i < _tenders.Count; i++)
+                if (_amounts[i] > 0 && RequiresPopup(_tenders[i].TenderType) && _details[i] == null)
+                    return i;
+            return -1;
         }
 
         // ── Summary ──────────────────────────────────────────────────────────
@@ -247,13 +319,31 @@ namespace SmartTenderWindowTenderSplit.Forms
         {
             if (_amounts.Sum() < _documentTotal) return;
 
+            // Block confirmation while a tender that requires extra data is missing it.
+            int missing = FirstMissingDetailIndex();
+            if (missing >= 0)
+            {
+                SelectTender(missing);
+                MessageBox.Show(
+                    "Preencha os detalhes do meio de pagamento selecionado antes de confirmar.",
+                    "Detalhes em falta", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             decimal total  = _amounts.Sum();
             decimal change = total > _documentTotal ? total - _documentTotal : 0m;
 
             Result = new TenderSplitResult
             {
                 Allocations = _tenders
-                    .Select((t, i) => new TenderAllocation { Tender = t, Amount = _amounts[i] })
+                    .Select((t, i) => new TenderAllocation
+                    {
+                        Tender           = t,
+                        Amount           = _amounts[i],
+                        BankTransfer     = _details[i] as BankTransferDetails,
+                        Check            = _details[i] as CheckDetails,
+                        CreditNoteRefund = _details[i] as CreditNoteRefundDetails
+                    })
                     .Where(a => a.Amount > 0)
                     .ToList(),
                 TotalAllocated = total,
@@ -317,6 +407,11 @@ namespace SmartTenderWindowTenderSplit.Forms
         {
             long raw = (long)(value * 100);
             return raw == 0 ? "0" : raw.ToString();
+        }
+
+        private void OpenDetailsForSelected(object sender, EventArgs e)
+        {
+            OpenDetailsForSelected();
         }
     }
 }

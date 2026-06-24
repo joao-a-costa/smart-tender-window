@@ -10,18 +10,18 @@ namespace SmartTenderWindow.Tests.Models
         // ── Constructor – valid ───────────────────────────────────────────────
 
         [TestMethod]
-        public void Constructor_ValidArguments_SetsIdAndName()
+        public void Constructor_ValidArguments_SetsTenderTypeAndName()
         {
-            var item = new TenderItem("CASH", "Numerário");
+            var item = new TenderItem(TenderTypeEnum.tndCash, "Numerário");
 
-            Assert.AreEqual("CASH", item.Id);
+            Assert.AreEqual(TenderTypeEnum.tndCash, item.TenderType);
             Assert.AreEqual("Numerário", item.Name);
         }
 
         [TestMethod]
         public void Constructor_ValidArguments_PreloadedAmountDefaultsToZero()
         {
-            var item = new TenderItem("CASH", "Numerário");
+            var item = new TenderItem(TenderTypeEnum.tndCash, "Numerário");
 
             Assert.AreEqual(0m, item.PreloadedAmount);
         }
@@ -29,7 +29,7 @@ namespace SmartTenderWindow.Tests.Models
         [TestMethod]
         public void Constructor_ValidArguments_MaxAmountDefaultsToNull()
         {
-            var item = new TenderItem("CASH", "Numerário");
+            var item = new TenderItem(TenderTypeEnum.tndCash, "Numerário");
 
             Assert.IsNull(item.MaxAmount);
         }
@@ -37,44 +37,27 @@ namespace SmartTenderWindow.Tests.Models
         [TestMethod]
         public void Constructor_ValidArguments_AllowsChangeDefaultsToFalse()
         {
-            var item = new TenderItem("CASH", "Numerário");
+            var item = new TenderItem(TenderTypeEnum.tndCash, "Numerário");
 
             Assert.IsFalse(item.AllowsChange);
         }
-
-        // ── Constructor – invalid Id ──────────────────────────────────────────
-
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
-        public void Constructor_NullId_ThrowsArgumentException()
-            => new TenderItem(null, "Numerário");
-
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
-        public void Constructor_EmptyId_ThrowsArgumentException()
-            => new TenderItem("", "Numerário");
-
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
-        public void Constructor_WhitespaceId_ThrowsArgumentException()
-            => new TenderItem("   ", "Numerário");
 
         // ── Constructor – invalid Name ────────────────────────────────────────
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
         public void Constructor_NullName_ThrowsArgumentException()
-            => new TenderItem("CASH", null);
+            => new TenderItem(TenderTypeEnum.tndCash, null);
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
         public void Constructor_EmptyName_ThrowsArgumentException()
-            => new TenderItem("CASH", "");
+            => new TenderItem(TenderTypeEnum.tndCash, "");
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
         public void Constructor_WhitespaceName_ThrowsArgumentException()
-            => new TenderItem("CASH", "   ");
+            => new TenderItem(TenderTypeEnum.tndCash, "   ");
 
         // ── Default constructor ───────────────────────────────────────────────
 
@@ -83,11 +66,15 @@ namespace SmartTenderWindow.Tests.Models
         {
             var item = new TenderItem();
 
-            Assert.IsNull(item.Id);
+            Assert.IsNull(item.TenderType);
             Assert.IsNull(item.Name);
             Assert.AreEqual(0m, item.PreloadedAmount);
             Assert.IsNull(item.MaxAmount);
             Assert.IsFalse(item.AllowsChange);
+            Assert.IsNull(item.BeneficiaryAccounts);
+            Assert.IsNull(item.PartyAccounts);
+            Assert.IsNull(item.Banks);
+            Assert.IsNull(item.Series);
         }
 
         // ── Property setters ──────────────────────────────────────────────────
@@ -95,7 +82,7 @@ namespace SmartTenderWindow.Tests.Models
         [TestMethod]
         public void Properties_CanBeSetAfterConstruction()
         {
-            var item = new TenderItem("CARD", "Cartão")
+            var item = new TenderItem(TenderTypeEnum.tndCreditDebitCard, "Cartão")
             {
                 PreloadedAmount = 50m,
                 MaxAmount       = 500m,
@@ -110,22 +97,29 @@ namespace SmartTenderWindow.Tests.Models
         [TestMethod]
         public void AllowsChange_CanBeSetToTrue()
         {
-            var item = new TenderItem("CASH", "Numerário") { AllowsChange = true };
+            var item = new TenderItem(TenderTypeEnum.tndCash, "Numerário") { AllowsChange = true };
             Assert.IsTrue(item.AllowsChange);
         }
 
         [TestMethod]
         public void MaxAmount_CanBeSetToZero()
         {
-            var item = new TenderItem("CASH", "Numerário") { MaxAmount = 0m };
+            var item = new TenderItem(TenderTypeEnum.tndCash, "Numerário") { MaxAmount = 0m };
             Assert.AreEqual(0m, item.MaxAmount);
         }
 
         [TestMethod]
         public void PreloadedAmount_CanBeSetToPositiveValue()
         {
-            var item = new TenderItem("CASH", "Numerário") { PreloadedAmount = 100.50m };
+            var item = new TenderItem(TenderTypeEnum.tndCash, "Numerário") { PreloadedAmount = 100.50m };
             Assert.AreEqual(100.50m, item.PreloadedAmount);
+        }
+
+        [TestMethod]
+        public void TenderType_CanBeSetToNull()
+        {
+            var item = new TenderItem { TenderType = null };
+            Assert.IsNull(item.TenderType);
         }
     }
 }

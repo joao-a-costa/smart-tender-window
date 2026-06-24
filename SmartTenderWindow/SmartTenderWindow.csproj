@@ -49,14 +49,46 @@
     <Compile Include="Forms\TenderSplitDialog.Designer.cs">
       <DependentUpon>TenderSplitDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\BankTransferDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\BankTransferDialog.Designer.cs">
+      <DependentUpon>BankTransferDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\CheckDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\CheckDialog.Designer.cs">
+      <DependentUpon>CheckDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\CreditNoteRefundDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\CreditNoteRefundDialog.Designer.cs">
+      <DependentUpon>CreditNoteRefundDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Models\BankTransferDetails.cs" />
+    <Compile Include="Models\CheckDetails.cs" />
+    <Compile Include="Models\CreditNoteRefundDetails.cs" />
     <Compile Include="Models\TenderAllocation.cs" />
     <Compile Include="Models\TenderItem.cs" />
+    <Compile Include="Models\TenderOption.cs" />
     <Compile Include="Models\TenderSplitResult.cs" />
+    <Compile Include="Models\TenderTypeEnum.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Forms\TenderSplitDialog.resx">
       <DependentUpon>TenderSplitDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\BankTransferDialog.resx">
+      <DependentUpon>BankTransferDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\CheckDialog.resx">
+      <DependentUpon>CheckDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\CreditNoteRefundDialog.resx">
+      <DependentUpon>CreditNoteRefundDialog.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

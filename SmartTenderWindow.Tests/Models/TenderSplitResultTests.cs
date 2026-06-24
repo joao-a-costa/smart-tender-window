@@ -20,7 +20,7 @@ namespace SmartTenderWindow.Tests.Models
         [TestMethod]
         public void Properties_SetAndGetCorrectly()
         {
-            var tender = new TenderItem("CASH", "Numerário");
+            var tender = new TenderItem(TenderTypeEnum.tndCash, "Numerário");
             var allocs = new List<TenderAllocation>
             {
                 new TenderAllocation { Tender = tender, Amount = 40m }
@@ -55,8 +55,8 @@ namespace SmartTenderWindow.Tests.Models
         {
             var allocs = new List<TenderAllocation>
             {
-                new TenderAllocation { Tender = new TenderItem("CASH", "Numerário"), Amount = 20m },
-                new TenderAllocation { Tender = new TenderItem("CARD", "Cartão"),    Amount = 17.50m }
+                new TenderAllocation { Tender = new TenderItem(TenderTypeEnum.tndCash, "Numerário"), Amount = 20m },
+                new TenderAllocation { Tender = new TenderItem(TenderTypeEnum.tndCreditDebitCard, "Cartão"), Amount = 17.50m }
             };
 
             var result = new TenderSplitResult

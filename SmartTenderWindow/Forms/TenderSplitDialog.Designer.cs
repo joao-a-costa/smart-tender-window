@@ -51,18 +51,20 @@ namespace SmartTenderWindowTenderSplit.Forms
             this.panelHeader = new System.Windows.Forms.Panel();
             this.lblHeader = new System.Windows.Forms.Label();
             this.panelLeft = new System.Windows.Forms.Panel();
+            this.btnDetails = new System.Windows.Forms.Button();
+            this.panelLeftBottom = new System.Windows.Forms.Panel();
+            this.lblDeliveredValue = new System.Windows.Forms.Label();
+            this.lblTotalValue = new System.Windows.Forms.Label();
+            this.lblTotalCaption = new System.Windows.Forms.Label();
+            this.lblMissingValue = new System.Windows.Forms.Label();
+            this.lblMissingCaption = new System.Windows.Forms.Label();
+            this.btnConfirm = new System.Windows.Forms.Button();
+            this.btnCancel = new System.Windows.Forms.Button();
+            this.lblDeliveredCaption = new System.Windows.Forms.Label();
             this.lblCategory = new System.Windows.Forms.Label();
             this.panelList = new System.Windows.Forms.Panel();
             this.btnNavUp = new System.Windows.Forms.Button();
             this.btnNavDown = new System.Windows.Forms.Button();
-            this.lblDeliveredCaption = new System.Windows.Forms.Label();
-            this.lblDeliveredValue = new System.Windows.Forms.Label();
-            this.lblMissingCaption = new System.Windows.Forms.Label();
-            this.lblMissingValue = new System.Windows.Forms.Label();
-            this.lblTotalCaption = new System.Windows.Forms.Label();
-            this.lblTotalValue = new System.Windows.Forms.Label();
-            this.btnCancel = new System.Windows.Forms.Button();
-            this.btnConfirm = new System.Windows.Forms.Button();
             this.panelNumpad = new System.Windows.Forms.Panel();
             this.btn1 = new System.Windows.Forms.Button();
             this.btn2 = new System.Windows.Forms.Button();
@@ -77,11 +79,10 @@ namespace SmartTenderWindowTenderSplit.Forms
             this.btn9 = new System.Windows.Forms.Button();
             this.btn0 = new System.Windows.Forms.Button();
             this.btnDot = new System.Windows.Forms.Button();
-            this.panelLeftBottom = new System.Windows.Forms.Panel();
             this.panelHeader.SuspendLayout();
             this.panelLeft.SuspendLayout();
-            this.panelNumpad.SuspendLayout();
             this.panelLeftBottom.SuspendLayout();
+            this.panelNumpad.SuspendLayout();
             this.SuspendLayout();
             // 
             // panelHeader
@@ -110,6 +111,7 @@ namespace SmartTenderWindowTenderSplit.Forms
             // panelLeft
             // 
             this.panelLeft.BackColor = System.Drawing.Color.White;
+            this.panelLeft.Controls.Add(this.btnDetails);
             this.panelLeft.Controls.Add(this.panelLeftBottom);
             this.panelLeft.Controls.Add(this.lblCategory);
             this.panelLeft.Controls.Add(this.panelList);
@@ -120,6 +122,138 @@ namespace SmartTenderWindowTenderSplit.Forms
             this.panelLeft.Name = "panelLeft";
             this.panelLeft.Size = new System.Drawing.Size(538, 549);
             this.panelLeft.TabIndex = 2;
+            // 
+            // btnDetails
+            // 
+            this.btnDetails.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnDetails.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(76)))), ((int)(((byte)(175)))), ((int)(((byte)(80)))));
+            this.btnDetails.FlatAppearance.BorderSize = 0;
+            this.btnDetails.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnDetails.Font = new System.Drawing.Font("Segoe UI", 12F);
+            this.btnDetails.ForeColor = System.Drawing.Color.White;
+            this.btnDetails.Location = new System.Drawing.Point(202, 306);
+            this.btnDetails.Name = "btnDetails";
+            this.btnDetails.Size = new System.Drawing.Size(127, 36);
+            this.btnDetails.TabIndex = 13;
+            this.btnDetails.Text = "Detalhes...";
+            this.btnDetails.UseVisualStyleBackColor = false;
+            this.btnDetails.Click += new System.EventHandler(this.OpenDetailsForSelected);
+            // 
+            // panelLeftBottom
+            // 
+            this.panelLeftBottom.Controls.Add(this.lblDeliveredValue);
+            this.panelLeftBottom.Controls.Add(this.lblTotalValue);
+            this.panelLeftBottom.Controls.Add(this.lblTotalCaption);
+            this.panelLeftBottom.Controls.Add(this.lblMissingValue);
+            this.panelLeftBottom.Controls.Add(this.lblMissingCaption);
+            this.panelLeftBottom.Controls.Add(this.btnConfirm);
+            this.panelLeftBottom.Controls.Add(this.btnCancel);
+            this.panelLeftBottom.Controls.Add(this.lblDeliveredCaption);
+            this.panelLeftBottom.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.panelLeftBottom.Location = new System.Drawing.Point(0, 348);
+            this.panelLeftBottom.Name = "panelLeftBottom";
+            this.panelLeftBottom.Size = new System.Drawing.Size(538, 201);
+            this.panelLeftBottom.TabIndex = 12;
+            // 
+            // lblDeliveredValue
+            // 
+            this.lblDeliveredValue.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblDeliveredValue.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Bold);
+            this.lblDeliveredValue.Location = new System.Drawing.Point(133, 29);
+            this.lblDeliveredValue.Name = "lblDeliveredValue";
+            this.lblDeliveredValue.Size = new System.Drawing.Size(393, 20);
+            this.lblDeliveredValue.TabIndex = 5;
+            this.lblDeliveredValue.Text = "0,00 €";
+            this.lblDeliveredValue.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // lblTotalValue
+            // 
+            this.lblTotalValue.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblTotalValue.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Bold);
+            this.lblTotalValue.Location = new System.Drawing.Point(137, 89);
+            this.lblTotalValue.Name = "lblTotalValue";
+            this.lblTotalValue.Size = new System.Drawing.Size(389, 20);
+            this.lblTotalValue.TabIndex = 9;
+            this.lblTotalValue.Text = "0,00 €";
+            this.lblTotalValue.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // lblTotalCaption
+            // 
+            this.lblTotalCaption.AutoSize = true;
+            this.lblTotalCaption.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Bold);
+            this.lblTotalCaption.Location = new System.Drawing.Point(10, 89);
+            this.lblTotalCaption.Name = "lblTotalCaption";
+            this.lblTotalCaption.Size = new System.Drawing.Size(52, 21);
+            this.lblTotalCaption.TabIndex = 8;
+            this.lblTotalCaption.Text = "Total:";
+            // 
+            // lblMissingValue
+            // 
+            this.lblMissingValue.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblMissingValue.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Bold);
+            this.lblMissingValue.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(211)))), ((int)(((byte)(47)))), ((int)(((byte)(47)))));
+            this.lblMissingValue.Location = new System.Drawing.Point(137, 59);
+            this.lblMissingValue.Name = "lblMissingValue";
+            this.lblMissingValue.Size = new System.Drawing.Size(389, 20);
+            this.lblMissingValue.TabIndex = 7;
+            this.lblMissingValue.Text = "0,00 €";
+            this.lblMissingValue.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // lblMissingCaption
+            // 
+            this.lblMissingCaption.AutoSize = true;
+            this.lblMissingCaption.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Bold);
+            this.lblMissingCaption.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(211)))), ((int)(((byte)(47)))), ((int)(((byte)(47)))));
+            this.lblMissingCaption.Location = new System.Drawing.Point(12, 58);
+            this.lblMissingCaption.Name = "lblMissingCaption";
+            this.lblMissingCaption.Size = new System.Drawing.Size(77, 21);
+            this.lblMissingCaption.TabIndex = 6;
+            this.lblMissingCaption.Text = "Em falta:";
+            // 
+            // btnConfirm
+            // 
+            this.btnConfirm.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnConfirm.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))));
+            this.btnConfirm.Enabled = false;
+            this.btnConfirm.FlatAppearance.BorderSize = 0;
+            this.btnConfirm.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnConfirm.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Bold);
+            this.btnConfirm.ForeColor = System.Drawing.Color.White;
+            this.btnConfirm.Location = new System.Drawing.Point(386, 126);
+            this.btnConfirm.Name = "btnConfirm";
+            this.btnConfirm.Size = new System.Drawing.Size(140, 62);
+            this.btnConfirm.TabIndex = 11;
+            this.btnConfirm.Text = "OK";
+            this.btnConfirm.UseVisualStyleBackColor = false;
+            this.btnConfirm.Click += new System.EventHandler(this.btnConfirm_Click);
+            // 
+            // btnCancel
+            // 
+            this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnCancel.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(211)))), ((int)(((byte)(47)))), ((int)(((byte)(47)))));
+            this.btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnCancel.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.btnCancel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(211)))), ((int)(((byte)(47)))), ((int)(((byte)(47)))));
+            this.btnCancel.Location = new System.Drawing.Point(14, 127);
+            this.btnCancel.Name = "btnCancel";
+            this.btnCancel.Size = new System.Drawing.Size(130, 62);
+            this.btnCancel.TabIndex = 10;
+            this.btnCancel.Text = "Cancelar";
+            this.btnCancel.UseVisualStyleBackColor = false;
+            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
+            // 
+            // lblDeliveredCaption
+            // 
+            this.lblDeliveredCaption.AutoSize = true;
+            this.lblDeliveredCaption.Font = new System.Drawing.Font("Segoe UI", 9.5F);
+            this.lblDeliveredCaption.Location = new System.Drawing.Point(12, 29);
+            this.lblDeliveredCaption.Name = "lblDeliveredCaption";
+            this.lblDeliveredCaption.Size = new System.Drawing.Size(115, 21);
+            this.lblDeliveredCaption.TabIndex = 4;
+            this.lblDeliveredCaption.Text = "Valor entregue:";
             // 
             // lblCategory
             // 
@@ -175,106 +309,6 @@ namespace SmartTenderWindowTenderSplit.Forms
             this.btnNavDown.Text = "▼";
             this.btnNavDown.UseVisualStyleBackColor = false;
             this.btnNavDown.Click += new System.EventHandler(this.btnNavDown_Click);
-            // 
-            // lblDeliveredCaption
-            // 
-            this.lblDeliveredCaption.AutoSize = true;
-            this.lblDeliveredCaption.Font = new System.Drawing.Font("Segoe UI", 9.5F);
-            this.lblDeliveredCaption.Location = new System.Drawing.Point(12, 29);
-            this.lblDeliveredCaption.Name = "lblDeliveredCaption";
-            this.lblDeliveredCaption.Size = new System.Drawing.Size(115, 21);
-            this.lblDeliveredCaption.TabIndex = 4;
-            this.lblDeliveredCaption.Text = "Valor entregue:";
-            // 
-            // lblDeliveredValue
-            // 
-            this.lblDeliveredValue.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.lblDeliveredValue.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Bold);
-            this.lblDeliveredValue.Location = new System.Drawing.Point(133, 29);
-            this.lblDeliveredValue.Name = "lblDeliveredValue";
-            this.lblDeliveredValue.Size = new System.Drawing.Size(393, 20);
-            this.lblDeliveredValue.TabIndex = 5;
-            this.lblDeliveredValue.Text = "0,00 €";
-            this.lblDeliveredValue.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            // 
-            // lblMissingCaption
-            // 
-            this.lblMissingCaption.AutoSize = true;
-            this.lblMissingCaption.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Bold);
-            this.lblMissingCaption.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(211)))), ((int)(((byte)(47)))), ((int)(((byte)(47)))));
-            this.lblMissingCaption.Location = new System.Drawing.Point(12, 58);
-            this.lblMissingCaption.Name = "lblMissingCaption";
-            this.lblMissingCaption.Size = new System.Drawing.Size(77, 21);
-            this.lblMissingCaption.TabIndex = 6;
-            this.lblMissingCaption.Text = "Em falta:";
-            // 
-            // lblMissingValue
-            // 
-            this.lblMissingValue.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.lblMissingValue.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Bold);
-            this.lblMissingValue.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(211)))), ((int)(((byte)(47)))), ((int)(((byte)(47)))));
-            this.lblMissingValue.Location = new System.Drawing.Point(137, 59);
-            this.lblMissingValue.Name = "lblMissingValue";
-            this.lblMissingValue.Size = new System.Drawing.Size(389, 20);
-            this.lblMissingValue.TabIndex = 7;
-            this.lblMissingValue.Text = "0,00 €";
-            this.lblMissingValue.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            // 
-            // lblTotalCaption
-            // 
-            this.lblTotalCaption.AutoSize = true;
-            this.lblTotalCaption.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Bold);
-            this.lblTotalCaption.Location = new System.Drawing.Point(10, 89);
-            this.lblTotalCaption.Name = "lblTotalCaption";
-            this.lblTotalCaption.Size = new System.Drawing.Size(52, 21);
-            this.lblTotalCaption.TabIndex = 8;
-            this.lblTotalCaption.Text = "Total:";
-            // 
-            // lblTotalValue
-            // 
-            this.lblTotalValue.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.lblTotalValue.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Bold);
-            this.lblTotalValue.Location = new System.Drawing.Point(137, 89);
-            this.lblTotalValue.Name = "lblTotalValue";
-            this.lblTotalValue.Size = new System.Drawing.Size(389, 20);
-            this.lblTotalValue.TabIndex = 9;
-            this.lblTotalValue.Text = "0,00 €";
-            this.lblTotalValue.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            // 
-            // btnCancel
-            // 
-            this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnCancel.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(211)))), ((int)(((byte)(47)))), ((int)(((byte)(47)))));
-            this.btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnCancel.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.btnCancel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(211)))), ((int)(((byte)(47)))), ((int)(((byte)(47)))));
-            this.btnCancel.Location = new System.Drawing.Point(14, 127);
-            this.btnCancel.Name = "btnCancel";
-            this.btnCancel.Size = new System.Drawing.Size(130, 62);
-            this.btnCancel.TabIndex = 10;
-            this.btnCancel.Text = "Cancelar";
-            this.btnCancel.UseVisualStyleBackColor = false;
-            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
-            // 
-            // btnConfirm
-            // 
-            this.btnConfirm.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnConfirm.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))));
-            this.btnConfirm.Enabled = false;
-            this.btnConfirm.FlatAppearance.BorderSize = 0;
-            this.btnConfirm.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnConfirm.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Bold);
-            this.btnConfirm.ForeColor = System.Drawing.Color.White;
-            this.btnConfirm.Location = new System.Drawing.Point(386, 126);
-            this.btnConfirm.Name = "btnConfirm";
-            this.btnConfirm.Size = new System.Drawing.Size(140, 62);
-            this.btnConfirm.TabIndex = 11;
-            this.btnConfirm.Text = "OK";
-            this.btnConfirm.UseVisualStyleBackColor = false;
-            this.btnConfirm.Click += new System.EventHandler(this.btnConfirm_Click);
             // 
             // panelNumpad
             // 
@@ -493,22 +527,6 @@ namespace SmartTenderWindowTenderSplit.Forms
             this.btnDot.UseVisualStyleBackColor = false;
             this.btnDot.Click += new System.EventHandler(this.OnNumpadClick);
             // 
-            // panelLeftBottom
-            // 
-            this.panelLeftBottom.Controls.Add(this.lblDeliveredValue);
-            this.panelLeftBottom.Controls.Add(this.lblTotalValue);
-            this.panelLeftBottom.Controls.Add(this.lblTotalCaption);
-            this.panelLeftBottom.Controls.Add(this.lblMissingValue);
-            this.panelLeftBottom.Controls.Add(this.lblMissingCaption);
-            this.panelLeftBottom.Controls.Add(this.btnConfirm);
-            this.panelLeftBottom.Controls.Add(this.btnCancel);
-            this.panelLeftBottom.Controls.Add(this.lblDeliveredCaption);
-            this.panelLeftBottom.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panelLeftBottom.Location = new System.Drawing.Point(0, 348);
-            this.panelLeftBottom.Name = "panelLeftBottom";
-            this.panelLeftBottom.Size = new System.Drawing.Size(538, 201);
-            this.panelLeftBottom.TabIndex = 12;
-            // 
             // TenderSplitDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -527,13 +545,14 @@ namespace SmartTenderWindowTenderSplit.Forms
             this.panelHeader.ResumeLayout(false);
             this.panelLeft.ResumeLayout(false);
             this.panelLeft.PerformLayout();
-            this.panelNumpad.ResumeLayout(false);
             this.panelLeftBottom.ResumeLayout(false);
             this.panelLeftBottom.PerformLayout();
+            this.panelNumpad.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
 
         private System.Windows.Forms.Panel panelLeftBottom;
+        private System.Windows.Forms.Button btnDetails;
     }
 }

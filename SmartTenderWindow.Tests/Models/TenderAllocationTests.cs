@@ -18,7 +18,7 @@ namespace SmartTenderWindow.Tests.Models
         [TestMethod]
         public void Properties_SetAndGetCorrectly()
         {
-            var tender = new TenderItem("CASH", "Numerário");
+            var tender = new TenderItem(TenderTypeEnum.tndCash, "Numerário");
             var alloc  = new TenderAllocation { Tender = tender, Amount = 37.50m };
 
             Assert.AreEqual(tender, alloc.Tender);
@@ -42,8 +42,8 @@ namespace SmartTenderWindow.Tests.Models
         [TestMethod]
         public void Tender_CanBeReassigned()
         {
-            var first  = new TenderItem("CASH", "Numerário");
-            var second = new TenderItem("CARD", "Cartão");
+            var first  = new TenderItem(TenderTypeEnum.tndCash, "Numerário");
+            var second = new TenderItem(TenderTypeEnum.tndCreditDebitCard, "Cartão");
             var alloc  = new TenderAllocation { Tender = first };
 
             alloc.Tender = second;

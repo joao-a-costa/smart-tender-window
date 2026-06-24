@@ -20,13 +20,13 @@ namespace SmartTenderWindow.Tests.Forms
 
         private static List<TenderItem> OneCashTender() => new List<TenderItem>
         {
-            new TenderItem("CASH", "Numerário") { AllowsChange = true }
+            new TenderItem(TenderTypeEnum.tndCash, "Numerário") { AllowsChange = true }
         };
 
         private static List<TenderItem> TwoTenders() => new List<TenderItem>
         {
-            new TenderItem("CASH", "Numerário") { AllowsChange = true },
-            new TenderItem("CARD", "Cartão")    { AllowsChange = false }
+            new TenderItem(TenderTypeEnum.tndCash, "Numerário") { AllowsChange = true },
+            new TenderItem(TenderTypeEnum.tndCreditDebitCard, "Cartão")    { AllowsChange = false }
         };
 
         // ── Constructor guards ────────────────────────────────────────────────
@@ -100,7 +100,7 @@ namespace SmartTenderWindow.Tests.Forms
             {
                 var tenders = new List<TenderItem>
                 {
-                    new TenderItem("CASH", "Numerário") { PreloadedAmount = 20m, AllowsChange = true }
+                    new TenderItem(TenderTypeEnum.tndCash, "Numerário") { PreloadedAmount = 20m, AllowsChange = true }
                 };
 
                 using (var dlg = new TenderSplitDialog(tenders, 37.50m))
@@ -331,7 +331,7 @@ namespace SmartTenderWindow.Tests.Forms
             {
                 var tenders = new List<TenderItem>
                 {
-                    new TenderItem("CARD", "Cartão") { MaxAmount = 50m, AllowsChange = false }
+                    new TenderItem(TenderTypeEnum.tndCreditDebitCard, "Cartão") { MaxAmount = 50m, AllowsChange = false }
                 };
 
                 using (var dlg = new TenderSplitDialog(tenders, 200m))
@@ -358,7 +358,7 @@ namespace SmartTenderWindow.Tests.Forms
             {
                 var tenders = new List<TenderItem>
                 {
-                    new TenderItem("CARD", "Cartão") { AllowsChange = false }
+                    new TenderItem(TenderTypeEnum.tndCreditDebitCard, "Cartão") { AllowsChange = false }
                 };
 
                 using (var dlg = new TenderSplitDialog(tenders, 37.50m))
@@ -382,7 +382,7 @@ namespace SmartTenderWindow.Tests.Forms
             {
                 var tenders = new List<TenderItem>
                 {
-                    new TenderItem("CASH", "Numerário") { AllowsChange = true }
+                    new TenderItem(TenderTypeEnum.tndCash, "Numerário") { AllowsChange = true }
                 };
 
                 using (var dlg = new TenderSplitDialog(tenders, 37.50m))
@@ -474,8 +474,8 @@ namespace SmartTenderWindow.Tests.Forms
             {
                 var tenders = new List<TenderItem>
                 {
-                    new TenderItem("CASH", "Numerário") { AllowsChange = true },
-                    new TenderItem("CARD", "Cartão")    { AllowsChange = false, PreloadedAmount = 15m }
+                    new TenderItem(TenderTypeEnum.tndCash, "Numerário") { AllowsChange = true },
+                    new TenderItem(TenderTypeEnum.tndCreditDebitCard, "Cartão")    { AllowsChange = false, PreloadedAmount = 15m }
                 };
 
                 using (var dlg = new TenderSplitDialog(tenders, 50m))
@@ -528,7 +528,7 @@ namespace SmartTenderWindow.Tests.Forms
             {
                 var tenders = new List<TenderItem>
                 {
-                    new TenderItem("CASH", "Numerário") { AllowsChange = true }
+                    new TenderItem(TenderTypeEnum.tndCash, "Numerário") { AllowsChange = true }
                 };
 
                 using (var dlg = new TenderSplitDialog(tenders, 10m))
@@ -567,7 +567,7 @@ namespace SmartTenderWindow.Tests.Forms
             {
                 var tenders = new List<TenderItem>
                 {
-                    new TenderItem("CASH", "Numerário") { AllowsChange = true }
+                    new TenderItem(TenderTypeEnum.tndCash, "Numerário") { AllowsChange = true }
                 };
 
                 using (var dlg = new TenderSplitDialog(tenders, 10m))
@@ -594,7 +594,7 @@ namespace SmartTenderWindow.Tests.Forms
             {
                 var tenders = new List<TenderItem>
                 {
-                    new TenderItem("CASH", "Numerário") { AllowsChange = true }
+                    new TenderItem(TenderTypeEnum.tndCash, "Numerário") { AllowsChange = true }
                 };
 
                 using (var dlg = new TenderSplitDialog(tenders, 10m))
@@ -622,7 +622,7 @@ namespace SmartTenderWindow.Tests.Forms
             {
                 var tenders = new List<TenderItem>
                 {
-                    new TenderItem("CASH", "Numerário") { AllowsChange = true }
+                    new TenderItem(TenderTypeEnum.tndCash, "Numerário") { AllowsChange = true }
                 };
 
                 using (var dlg = new TenderSplitDialog(tenders, 7.50m))
@@ -668,8 +668,8 @@ namespace SmartTenderWindow.Tests.Forms
             {
                 var tenders = new List<TenderItem>
                 {
-                    new TenderItem("CASH", "Numerário") { AllowsChange = true },
-                    new TenderItem("CARD", "Cartão")    { AllowsChange = false }
+                    new TenderItem(TenderTypeEnum.tndCash, "Numerário") { AllowsChange = true },
+                    new TenderItem(TenderTypeEnum.tndCreditDebitCard, "Cartão")    { AllowsChange = false }
                 };
 
                 using (var dlg = new TenderSplitDialog(tenders, 10m))
@@ -684,7 +684,7 @@ namespace SmartTenderWindow.Tests.Forms
 
                     Assert.IsNotNull(dlg.Result);
                     Assert.AreEqual(1, dlg.Result.Allocations.Count);
-                    Assert.AreEqual("CASH", dlg.Result.Allocations[0].Tender.Id);
+                    Assert.AreEqual(TenderTypeEnum.tndCash, dlg.Result.Allocations[0].Tender.TenderType);
                 }
             });
         }
@@ -696,8 +696,8 @@ namespace SmartTenderWindow.Tests.Forms
             {
                 var tenders = new List<TenderItem>
                 {
-                    new TenderItem("CASH", "Numerário") { AllowsChange = true },
-                    new TenderItem("CARD", "Cartão")    { AllowsChange = false }
+                    new TenderItem(TenderTypeEnum.tndCash, "Numerário") { AllowsChange = true },
+                    new TenderItem(TenderTypeEnum.tndCreditDebitCard, "Cartão")    { AllowsChange = false }
                 };
 
                 using (var dlg = new TenderSplitDialog(tenders, 30m))
@@ -724,9 +724,9 @@ namespace SmartTenderWindow.Tests.Forms
                     Assert.AreEqual(0m,   dlg.Result.ChangeDue);
 
                     decimal cashAmount = dlg.Result.Allocations
-                        .Find(a => a.Tender.Id == "CASH").Amount;
+                        .Find(a => a.Tender.TenderType == TenderTypeEnum.tndCash).Amount;
                     decimal cardAmount = dlg.Result.Allocations
-                        .Find(a => a.Tender.Id == "CARD").Amount;
+                        .Find(a => a.Tender.TenderType == TenderTypeEnum.tndCreditDebitCard).Amount;
 
                     Assert.AreEqual(20m, cashAmount);
                     Assert.AreEqual(10m, cardAmount);

@@ -8,10 +8,18 @@ namespace SmartTenderWindow.Windows
 {
     public partial class MainForm : Form
     {
-        private static readonly string[] TenderNames =
+        private static readonly (TenderTypeEnum Type, string Name)[] TenderPool =
         {
-            "Numerário", "Cartão de Crédito", "Cartão de Débito", "Cheque",
-            "Transferência", "Vale", "MB Way", "PayPal", "Multibanco", "Ticket"
+            (TenderTypeEnum.tndCash, "Numerário"),
+            (TenderTypeEnum.tndCreditDebitCard, "Cartão"),
+            (TenderTypeEnum.tndCheck, "Cheque"),
+            (TenderTypeEnum.tndBankWireTransfer, "Transferência"),
+            (TenderTypeEnum.tndVoucher, "Nota de Crédito-Reembolso"),
+            (TenderTypeEnum.tndMBWay, "MB Way"),
+            (TenderTypeEnum.tndRefMB, "Multibanco"),
+            (TenderTypeEnum.tndCoupon, "Cupão"),
+            (TenderTypeEnum.tndCustomerAccount, "Conta Corrente"),
+            (TenderTypeEnum.tndBankReceipt, "Recibo Bancário")
         };
 
         private static readonly Random Rng = new Random();
@@ -28,26 +36,32 @@ namespace SmartTenderWindow.Windows
             int count = (int)nudTenderCount.Value;
             decimal total = nudDocumentTotal.Value;
 
-            var pool = new List<string>(TenderNames);
+            var pool = new List<(TenderTypeEnum Type, string Name)>(TenderPool);
             var tenders = new List<TenderItem>();
 
             for (int i = 0; i < count; i++)
             {
+                TenderTypeEnum type;
                 string name;
                 if (pool.Count > 0)
                 {
                     int idx = Rng.Next(pool.Count);
-                    name = pool[idx];
+                    (type, name) = pool[idx];
                     pool.RemoveAt(idx);
                 }
                 else
                 {
+                    type = TenderTypeEnum.tndCash;
                     name = $"Tender {i + 1}";
                 }
 
-                tenders.Add(new TenderItem($"T{i + 1}", name)
+                tenders.Add(new TenderItem(type, name)
                 {
-                    AllowsChange = (i == 0)
+                    AllowsChange = (i == 0),
+                    BeneficiaryAccounts = SampleOptions("Banco Comercial Português", "Caixa Geral de Depósitos"),
+                    PartyAccounts = SampleOptions("Conta Cliente A", "Conta Cliente B"),
+                    Banks = SampleOptions("Millennium BCP", "CGD", "Novo Banco"),
+                    Series = SampleOptions("1", "2")
                 });
             }
 
@@ -61,6 +75,14 @@ namespace SmartTenderWindow.Windows
                 lines.AppendLine($"Troco: {result.ChangeDue:N2} €");
                 MessageBox.Show(lines.ToString(), "Resultado", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
+        }
+
+        private static List<TenderOption> SampleOptions(params string[] labels)
+        {
+            var list = new List<TenderOption>();
+            for (int i = 0; i < labels.Length; i++)
+                list.Add(new TenderOption((i + 1).ToString(), labels[i]));
+            return list;
         }
     }
 }
