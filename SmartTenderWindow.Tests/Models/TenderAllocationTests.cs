@@ -50,5 +50,89 @@ namespace SmartTenderWindow.Tests.Models
 
             Assert.AreEqual(second, alloc.Tender);
         }
+
+        [TestMethod]
+        public void BankTransfer_DefaultsToNull()
+        {
+            var alloc = new TenderAllocation();
+            Assert.IsNull(alloc.BankTransfer);
+        }
+
+        [TestMethod]
+        public void BankTransfer_CanBeSetAndRetrieved()
+        {
+            var details = new BankTransferDetails
+            {
+                BankAccountId = "ACCT001",
+                PartyBankAccountId = "PARTY001",
+                ContractReferenceNumber = "REF123"
+            };
+            var alloc = new TenderAllocation { BankTransfer = details };
+
+            Assert.AreEqual(details, alloc.BankTransfer);
+            Assert.AreEqual("ACCT001", alloc.BankTransfer.BankAccountId);
+        }
+
+        [TestMethod]
+        public void Check_DefaultsToNull()
+        {
+            var alloc = new TenderAllocation();
+            Assert.IsNull(alloc.Check);
+        }
+
+        [TestMethod]
+        public void Check_CanBeSetAndRetrieved()
+        {
+            var details = new CheckDetails
+            {
+                CheckSequenceNumber = "CHK12345",
+                CheckAmount = 100m,
+                BankId = "BANK001"
+            };
+            var alloc = new TenderAllocation { Check = details };
+
+            Assert.AreEqual(details, alloc.Check);
+            Assert.AreEqual("CHK12345", alloc.Check.CheckSequenceNumber);
+        }
+
+        [TestMethod]
+        public void CreditNoteRefund_DefaultsToNull()
+        {
+            var alloc = new TenderAllocation();
+            Assert.IsNull(alloc.CreditNoteRefund);
+        }
+
+        [TestMethod]
+        public void CreditNoteRefund_CanBeSetAndRetrieved()
+        {
+            var details = new CreditNoteRefundDetails
+            {
+                TransSerial = "S1",
+                TransDocument = "Nota de Crédito-Reembolso",
+                TransDocNumber = 1000,
+                TotalAmount = 50m,
+                SpentValueAmount = 25m
+            };
+            var alloc = new TenderAllocation { CreditNoteRefund = details };
+
+            Assert.AreEqual(details, alloc.CreditNoteRefund);
+            Assert.AreEqual(50m, alloc.CreditNoteRefund.TotalAmount);
+        }
+
+        [TestMethod]
+        public void Multiple_DetailTypes_CanCoexist_OnlyOneIsPopulated()
+        {
+            var bankDetails = new BankTransferDetails { BankAccountId = "ACCT001" };
+            var alloc = new TenderAllocation
+            {
+                BankTransfer = bankDetails,
+                Check = null,
+                CreditNoteRefund = null
+            };
+
+            Assert.IsNotNull(alloc.BankTransfer);
+            Assert.IsNull(alloc.Check);
+            Assert.IsNull(alloc.CreditNoteRefund);
+        }
     }
 }

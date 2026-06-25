@@ -49,8 +49,8 @@ namespace SmartTenderWindowTenderSplit.Forms
 
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
             this.panelHeader = new System.Windows.Forms.Panel();
             this.lblHeader = new System.Windows.Forms.Label();
             this.panelLeft = new System.Windows.Forms.Panel();
@@ -183,13 +183,13 @@ namespace SmartTenderWindowTenderSplit.Forms
             // 
             // btnDetails
             // 
-            this.btnDetails.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnDetails.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnDetails.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(76)))), ((int)(((byte)(175)))), ((int)(((byte)(80)))));
             this.btnDetails.FlatAppearance.BorderSize = 0;
             this.btnDetails.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnDetails.Font = new System.Drawing.Font("Segoe UI", 12F);
             this.btnDetails.ForeColor = System.Drawing.Color.White;
-            this.btnDetails.Location = new System.Drawing.Point(156, 9);
+            this.btnDetails.Location = new System.Drawing.Point(238, 9);
             this.btnDetails.Margin = new System.Windows.Forms.Padding(2);
             this.btnDetails.Name = "btnDetails";
             this.btnDetails.Size = new System.Drawing.Size(95, 29);
@@ -307,7 +307,7 @@ namespace SmartTenderWindowTenderSplit.Forms
             this.btnConfirm.Location = new System.Drawing.Point(232, 103);
             this.btnConfirm.Margin = new System.Windows.Forms.Padding(2);
             this.btnConfirm.Name = "btnConfirm";
-            this.btnConfirm.Size = new System.Drawing.Size(105, 50);
+            this.btnConfirm.Size = new System.Drawing.Size(101, 50);
             this.btnConfirm.TabIndex = 11;
             this.btnConfirm.Text = "OK";
             this.btnConfirm.UseVisualStyleBackColor = false;
@@ -320,10 +320,10 @@ namespace SmartTenderWindowTenderSplit.Forms
             this.btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnCancel.Font = new System.Drawing.Font("Segoe UI", 10F);
             this.btnCancel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(211)))), ((int)(((byte)(47)))), ((int)(((byte)(47)))));
-            this.btnCancel.Location = new System.Drawing.Point(10, 103);
+            this.btnCancel.Location = new System.Drawing.Point(13, 103);
             this.btnCancel.Margin = new System.Windows.Forms.Padding(2);
             this.btnCancel.Name = "btnCancel";
-            this.btnCancel.Size = new System.Drawing.Size(98, 49);
+            this.btnCancel.Size = new System.Drawing.Size(95, 49);
             this.btnCancel.TabIndex = 10;
             this.btnCancel.Text = "Cancelar";
             this.btnCancel.UseVisualStyleBackColor = false;
@@ -573,16 +573,16 @@ namespace SmartTenderWindowTenderSplit.Forms
             // 
             // colTenderName
             // 
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.colTenderName.DefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.colTenderName.DefaultCellStyle = dataGridViewCellStyle5;
             this.colTenderName.HeaderText = "Modalidade";
             this.colTenderName.Name = "colTenderName";
             this.colTenderName.ReadOnly = true;
             // 
             // colAmount
             // 
-            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.colAmount.DefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.colAmount.DefaultCellStyle = dataGridViewCellStyle6;
             this.colAmount.HeaderText = "Valor (€)";
             this.colAmount.Name = "colAmount";
             // 
