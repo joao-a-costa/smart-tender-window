@@ -21,6 +21,7 @@ namespace SmartTenderWindow.Windows
             this.nudDocumentTotal = new System.Windows.Forms.NumericUpDown();
             this.btnOpenTender = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
+            this.txtJsonResult = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.nudTenderCount)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudDocumentTotal)).BeginInit();
             this.SuspendLayout();
@@ -92,9 +93,9 @@ namespace SmartTenderWindow.Windows
             this.btnOpenTender.Text = "Open Tender Window";
             this.btnOpenTender.UseVisualStyleBackColor = true;
             this.btnOpenTender.Click += new System.EventHandler(this.btnOpenTender_Click);
-            // 
+            //
             // button1
-            // 
+            //
             this.button1.Location = new System.Drawing.Point(27, 146);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(330, 30);
@@ -102,12 +103,24 @@ namespace SmartTenderWindow.Windows
             this.button1.Text = "Open Test Window";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
+            //
+            // txtJsonResult
+            //
+            this.txtJsonResult.Location = new System.Drawing.Point(24, 182);
+            this.txtJsonResult.Multiline = true;
+            this.txtJsonResult.Name = "txtJsonResult";
+            this.txtJsonResult.ReadOnly = true;
+            this.txtJsonResult.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.txtJsonResult.Size = new System.Drawing.Size(330, 200);
+            this.txtJsonResult.TabIndex = 4;
+            this.txtJsonResult.WordWrap = false;
             // 
             // MainForm
-            // 
+            //
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(378, 234);
+            this.ClientSize = new System.Drawing.Size(378, 420);
+            this.Controls.Add(this.txtJsonResult);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.lblTenderCount);
             this.Controls.Add(this.nudTenderCount);
@@ -135,5 +148,6 @@ namespace SmartTenderWindow.Windows
         private System.Windows.Forms.NumericUpDown nudDocumentTotal;
         private System.Windows.Forms.Button btnOpenTender;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.TextBox txtJsonResult;
     }
 }

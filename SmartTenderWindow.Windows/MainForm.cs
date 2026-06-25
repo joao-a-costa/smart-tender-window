@@ -3,6 +3,7 @@ using SmartTenderWindowTenderSplit.Models;
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using Newtonsoft.Json;
 
 namespace SmartTenderWindow.Windows
 {
@@ -69,11 +70,12 @@ namespace SmartTenderWindow.Windows
 
             if (result != null)
             {
-                var lines = new System.Text.StringBuilder();
-                foreach (var alloc in result.Allocations)
-                    lines.AppendLine($"{alloc.Tender.Name}: {alloc.Amount:N2} €");
-                lines.AppendLine($"Troco: {result.ChangeDue:N2} €");
-                MessageBox.Show(lines.ToString(), "Resultado", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                string json = JsonConvert.SerializeObject(result, Formatting.Indented);
+                txtJsonResult.Text = json;
+            }
+            else
+            {
+                txtJsonResult.Text = "";
             }
         }
 
