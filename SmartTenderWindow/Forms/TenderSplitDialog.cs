@@ -252,7 +252,6 @@ namespace SmartTenderWindowTenderSplit.Forms
             if (index >= 0 && index < dgvTenders.Rows.Count)
             {
                 dgvTenders.Rows[index].Selected = true;
-                dgvTenders.FirstDisplayedScrollingRowIndex = index;
             }
 
             if (btnDetails != null)

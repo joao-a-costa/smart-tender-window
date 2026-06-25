@@ -84,6 +84,9 @@ namespace SmartTenderWindowTenderSplit.Forms
             this.btnDot = new System.Windows.Forms.Button();
             this.colTenderName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colAmount = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.panelLeftTopTop = new System.Windows.Forms.Panel();
+            this.panelLeftTopLeft = new System.Windows.Forms.Panel();
+            this.panelLeftTopRight = new System.Windows.Forms.Panel();
             this.panelHeader.SuspendLayout();
             this.panelLeft.SuspendLayout();
             this.panelLeftTopBottom.SuspendLayout();
@@ -120,6 +123,9 @@ namespace SmartTenderWindowTenderSplit.Forms
             // 
             this.panelLeft.BackColor = System.Drawing.Color.White;
             this.panelLeft.Controls.Add(this.dgvTenders);
+            this.panelLeft.Controls.Add(this.panelLeftTopRight);
+            this.panelLeft.Controls.Add(this.panelLeftTopLeft);
+            this.panelLeft.Controls.Add(this.panelLeftTopTop);
             this.panelLeft.Controls.Add(this.panelLeftTopBottom);
             this.panelLeft.Controls.Add(this.panelLeftBottom);
             this.panelLeft.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -131,6 +137,7 @@ namespace SmartTenderWindowTenderSplit.Forms
             // 
             // panelLeftTopBottom
             // 
+            this.panelLeftTopBottom.BackColor = System.Drawing.Color.WhiteSmoke;
             this.panelLeftTopBottom.Controls.Add(this.btnNavDown);
             this.panelLeftTopBottom.Controls.Add(this.btnNavUp);
             this.panelLeftTopBottom.Controls.Add(this.btnDetails);
@@ -201,14 +208,15 @@ namespace SmartTenderWindowTenderSplit.Forms
             this.colTenderName,
             this.colAmount});
             this.dgvTenders.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dgvTenders.Location = new System.Drawing.Point(0, 0);
+            this.dgvTenders.Location = new System.Drawing.Point(13, 29);
             this.dgvTenders.Name = "dgvTenders";
             this.dgvTenders.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgvTenders.Size = new System.Drawing.Size(346, 236);
+            this.dgvTenders.Size = new System.Drawing.Size(320, 207);
             this.dgvTenders.TabIndex = 14;
             // 
             // panelLeftBottom
             // 
+            this.panelLeftBottom.BackColor = System.Drawing.Color.WhiteSmoke;
             this.panelLeftBottom.Controls.Add(this.lblDeliveredValue);
             this.panelLeftBottom.Controls.Add(this.lblTotalValue);
             this.panelLeftBottom.Controls.Add(this.lblTotalCaption);
@@ -578,6 +586,33 @@ namespace SmartTenderWindowTenderSplit.Forms
             this.colAmount.HeaderText = "Valor (€)";
             this.colAmount.Name = "colAmount";
             // 
+            // panelLeftTopTop
+            // 
+            this.panelLeftTopTop.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.panelLeftTopTop.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panelLeftTopTop.Location = new System.Drawing.Point(0, 0);
+            this.panelLeftTopTop.Name = "panelLeftTopTop";
+            this.panelLeftTopTop.Size = new System.Drawing.Size(346, 29);
+            this.panelLeftTopTop.TabIndex = 16;
+            // 
+            // panelLeftTopLeft
+            // 
+            this.panelLeftTopLeft.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.panelLeftTopLeft.Dock = System.Windows.Forms.DockStyle.Left;
+            this.panelLeftTopLeft.Location = new System.Drawing.Point(0, 29);
+            this.panelLeftTopLeft.Name = "panelLeftTopLeft";
+            this.panelLeftTopLeft.Size = new System.Drawing.Size(13, 207);
+            this.panelLeftTopLeft.TabIndex = 17;
+            // 
+            // panelLeftTopRight
+            // 
+            this.panelLeftTopRight.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.panelLeftTopRight.Dock = System.Windows.Forms.DockStyle.Right;
+            this.panelLeftTopRight.Location = new System.Drawing.Point(333, 29);
+            this.panelLeftTopRight.Name = "panelLeftTopRight";
+            this.panelLeftTopRight.Size = new System.Drawing.Size(13, 207);
+            this.panelLeftTopRight.TabIndex = 18;
+            // 
             // TenderSplitDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -611,5 +646,8 @@ namespace SmartTenderWindowTenderSplit.Forms
         private Panel panelLeftTopBottom;
         private DataGridViewTextBoxColumn colTenderName;
         private DataGridViewTextBoxColumn colAmount;
+        private Panel panelLeftTopTop;
+        private Panel panelLeftTopRight;
+        private Panel panelLeftTopLeft;
     }
 }
