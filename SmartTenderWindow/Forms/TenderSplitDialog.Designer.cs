@@ -1,3 +1,6 @@
+using System;
+using System.Windows.Forms;
+
 namespace SmartTenderWindowTenderSplit.Forms
 {
     partial class TenderSplitDialog
@@ -10,8 +13,6 @@ namespace SmartTenderWindowTenderSplit.Forms
 
         // ── Left panel ────────────────────────────────────────────────────────
         private System.Windows.Forms.Panel panelLeft;
-        private System.Windows.Forms.Label lblCategory;
-        private System.Windows.Forms.Panel panelList;
         private System.Windows.Forms.Button btnNavUp;
         private System.Windows.Forms.Button btnNavDown;
         private System.Windows.Forms.Label lblDeliveredCaption;
@@ -48,10 +49,16 @@ namespace SmartTenderWindowTenderSplit.Forms
 
         private void InitializeComponent()
         {
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
             this.panelHeader = new System.Windows.Forms.Panel();
             this.lblHeader = new System.Windows.Forms.Label();
             this.panelLeft = new System.Windows.Forms.Panel();
+            this.panelLeftTopBottom = new System.Windows.Forms.Panel();
+            this.btnNavDown = new System.Windows.Forms.Button();
+            this.btnNavUp = new System.Windows.Forms.Button();
             this.btnDetails = new System.Windows.Forms.Button();
+            this.dgvTenders = new System.Windows.Forms.DataGridView();
             this.panelLeftBottom = new System.Windows.Forms.Panel();
             this.lblDeliveredValue = new System.Windows.Forms.Label();
             this.lblTotalValue = new System.Windows.Forms.Label();
@@ -61,10 +68,6 @@ namespace SmartTenderWindowTenderSplit.Forms
             this.btnConfirm = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
             this.lblDeliveredCaption = new System.Windows.Forms.Label();
-            this.lblCategory = new System.Windows.Forms.Label();
-            this.panelList = new System.Windows.Forms.Panel();
-            this.btnNavUp = new System.Windows.Forms.Button();
-            this.btnNavDown = new System.Windows.Forms.Button();
             this.panelNumpad = new System.Windows.Forms.Panel();
             this.btn1 = new System.Windows.Forms.Button();
             this.btn2 = new System.Windows.Forms.Button();
@@ -79,8 +82,12 @@ namespace SmartTenderWindowTenderSplit.Forms
             this.btn9 = new System.Windows.Forms.Button();
             this.btn0 = new System.Windows.Forms.Button();
             this.btnDot = new System.Windows.Forms.Button();
+            this.colTenderName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colAmount = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.panelHeader.SuspendLayout();
             this.panelLeft.SuspendLayout();
+            this.panelLeftTopBottom.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvTenders)).BeginInit();
             this.panelLeftBottom.SuspendLayout();
             this.panelNumpad.SuspendLayout();
             this.SuspendLayout();
@@ -93,7 +100,7 @@ namespace SmartTenderWindowTenderSplit.Forms
             this.panelHeader.Location = new System.Drawing.Point(0, 0);
             this.panelHeader.Margin = new System.Windows.Forms.Padding(0);
             this.panelHeader.Name = "panelHeader";
-            this.panelHeader.Size = new System.Drawing.Size(820, 52);
+            this.panelHeader.Size = new System.Drawing.Size(558, 42);
             this.panelHeader.TabIndex = 0;
             // 
             // lblHeader
@@ -102,8 +109,9 @@ namespace SmartTenderWindowTenderSplit.Forms
             this.lblHeader.Font = new System.Drawing.Font("Segoe UI", 14F, System.Drawing.FontStyle.Bold);
             this.lblHeader.ForeColor = System.Drawing.Color.White;
             this.lblHeader.Location = new System.Drawing.Point(0, 0);
+            this.lblHeader.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lblHeader.Name = "lblHeader";
-            this.lblHeader.Size = new System.Drawing.Size(820, 52);
+            this.lblHeader.Size = new System.Drawing.Size(558, 42);
             this.lblHeader.TabIndex = 0;
             this.lblHeader.Text = "Indique o método de pagamento:";
             this.lblHeader.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -111,17 +119,60 @@ namespace SmartTenderWindowTenderSplit.Forms
             // panelLeft
             // 
             this.panelLeft.BackColor = System.Drawing.Color.White;
-            this.panelLeft.Controls.Add(this.btnDetails);
+            this.panelLeft.Controls.Add(this.dgvTenders);
+            this.panelLeft.Controls.Add(this.panelLeftTopBottom);
             this.panelLeft.Controls.Add(this.panelLeftBottom);
-            this.panelLeft.Controls.Add(this.lblCategory);
-            this.panelLeft.Controls.Add(this.panelList);
-            this.panelLeft.Controls.Add(this.btnNavUp);
-            this.panelLeft.Controls.Add(this.btnNavDown);
             this.panelLeft.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelLeft.Location = new System.Drawing.Point(0, 52);
+            this.panelLeft.Location = new System.Drawing.Point(0, 42);
+            this.panelLeft.Margin = new System.Windows.Forms.Padding(2);
             this.panelLeft.Name = "panelLeft";
-            this.panelLeft.Size = new System.Drawing.Size(538, 549);
+            this.panelLeft.Size = new System.Drawing.Size(346, 445);
             this.panelLeft.TabIndex = 2;
+            // 
+            // panelLeftTopBottom
+            // 
+            this.panelLeftTopBottom.Controls.Add(this.btnNavDown);
+            this.panelLeftTopBottom.Controls.Add(this.btnNavUp);
+            this.panelLeftTopBottom.Controls.Add(this.btnDetails);
+            this.panelLeftTopBottom.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.panelLeftTopBottom.Location = new System.Drawing.Point(0, 236);
+            this.panelLeftTopBottom.Name = "panelLeftTopBottom";
+            this.panelLeftTopBottom.Size = new System.Drawing.Size(346, 46);
+            this.panelLeftTopBottom.TabIndex = 15;
+            // 
+            // btnNavDown
+            // 
+            this.btnNavDown.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnNavDown.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(76)))), ((int)(((byte)(175)))), ((int)(((byte)(80)))));
+            this.btnNavDown.FlatAppearance.BorderSize = 0;
+            this.btnNavDown.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnNavDown.Font = new System.Drawing.Font("Segoe UI", 12F);
+            this.btnNavDown.ForeColor = System.Drawing.Color.White;
+            this.btnNavDown.Location = new System.Drawing.Point(84, 9);
+            this.btnNavDown.Margin = new System.Windows.Forms.Padding(2);
+            this.btnNavDown.Name = "btnNavDown";
+            this.btnNavDown.Size = new System.Drawing.Size(68, 29);
+            this.btnNavDown.TabIndex = 3;
+            this.btnNavDown.Text = "▼";
+            this.btnNavDown.UseVisualStyleBackColor = false;
+            this.btnNavDown.Click += new System.EventHandler(this.btnNavDown_Click);
+            // 
+            // btnNavUp
+            // 
+            this.btnNavUp.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnNavUp.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(76)))), ((int)(((byte)(175)))), ((int)(((byte)(80)))));
+            this.btnNavUp.FlatAppearance.BorderSize = 0;
+            this.btnNavUp.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnNavUp.Font = new System.Drawing.Font("Segoe UI", 12F);
+            this.btnNavUp.ForeColor = System.Drawing.Color.White;
+            this.btnNavUp.Location = new System.Drawing.Point(12, 9);
+            this.btnNavUp.Margin = new System.Windows.Forms.Padding(2);
+            this.btnNavUp.Name = "btnNavUp";
+            this.btnNavUp.Size = new System.Drawing.Size(68, 29);
+            this.btnNavUp.TabIndex = 2;
+            this.btnNavUp.Text = "▲";
+            this.btnNavUp.UseVisualStyleBackColor = false;
+            this.btnNavUp.Click += new System.EventHandler(this.btnNavUp_Click);
             // 
             // btnDetails
             // 
@@ -131,13 +182,30 @@ namespace SmartTenderWindowTenderSplit.Forms
             this.btnDetails.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnDetails.Font = new System.Drawing.Font("Segoe UI", 12F);
             this.btnDetails.ForeColor = System.Drawing.Color.White;
-            this.btnDetails.Location = new System.Drawing.Point(202, 306);
+            this.btnDetails.Location = new System.Drawing.Point(156, 9);
+            this.btnDetails.Margin = new System.Windows.Forms.Padding(2);
             this.btnDetails.Name = "btnDetails";
-            this.btnDetails.Size = new System.Drawing.Size(127, 36);
+            this.btnDetails.Size = new System.Drawing.Size(95, 29);
             this.btnDetails.TabIndex = 13;
             this.btnDetails.Text = "Detalhes...";
             this.btnDetails.UseVisualStyleBackColor = false;
             this.btnDetails.Click += new System.EventHandler(this.OpenDetailsForSelected);
+            // 
+            // dgvTenders
+            // 
+            this.dgvTenders.AllowUserToAddRows = false;
+            this.dgvTenders.AllowUserToDeleteRows = false;
+            this.dgvTenders.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgvTenders.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgvTenders.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.colTenderName,
+            this.colAmount});
+            this.dgvTenders.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dgvTenders.Location = new System.Drawing.Point(0, 0);
+            this.dgvTenders.Name = "dgvTenders";
+            this.dgvTenders.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.dgvTenders.Size = new System.Drawing.Size(346, 236);
+            this.dgvTenders.TabIndex = 14;
             // 
             // panelLeftBottom
             // 
@@ -150,9 +218,10 @@ namespace SmartTenderWindowTenderSplit.Forms
             this.panelLeftBottom.Controls.Add(this.btnCancel);
             this.panelLeftBottom.Controls.Add(this.lblDeliveredCaption);
             this.panelLeftBottom.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panelLeftBottom.Location = new System.Drawing.Point(0, 348);
+            this.panelLeftBottom.Location = new System.Drawing.Point(0, 282);
+            this.panelLeftBottom.Margin = new System.Windows.Forms.Padding(2);
             this.panelLeftBottom.Name = "panelLeftBottom";
-            this.panelLeftBottom.Size = new System.Drawing.Size(538, 201);
+            this.panelLeftBottom.Size = new System.Drawing.Size(346, 163);
             this.panelLeftBottom.TabIndex = 12;
             // 
             // lblDeliveredValue
@@ -160,9 +229,10 @@ namespace SmartTenderWindowTenderSplit.Forms
             this.lblDeliveredValue.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lblDeliveredValue.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Bold);
-            this.lblDeliveredValue.Location = new System.Drawing.Point(133, 29);
+            this.lblDeliveredValue.Location = new System.Drawing.Point(100, 24);
+            this.lblDeliveredValue.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lblDeliveredValue.Name = "lblDeliveredValue";
-            this.lblDeliveredValue.Size = new System.Drawing.Size(393, 20);
+            this.lblDeliveredValue.Size = new System.Drawing.Size(237, 16);
             this.lblDeliveredValue.TabIndex = 5;
             this.lblDeliveredValue.Text = "0,00 €";
             this.lblDeliveredValue.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -172,9 +242,10 @@ namespace SmartTenderWindowTenderSplit.Forms
             this.lblTotalValue.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lblTotalValue.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Bold);
-            this.lblTotalValue.Location = new System.Drawing.Point(137, 89);
+            this.lblTotalValue.Location = new System.Drawing.Point(103, 72);
+            this.lblTotalValue.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lblTotalValue.Name = "lblTotalValue";
-            this.lblTotalValue.Size = new System.Drawing.Size(389, 20);
+            this.lblTotalValue.Size = new System.Drawing.Size(234, 16);
             this.lblTotalValue.TabIndex = 9;
             this.lblTotalValue.Text = "0,00 €";
             this.lblTotalValue.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -183,9 +254,10 @@ namespace SmartTenderWindowTenderSplit.Forms
             // 
             this.lblTotalCaption.AutoSize = true;
             this.lblTotalCaption.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Bold);
-            this.lblTotalCaption.Location = new System.Drawing.Point(10, 89);
+            this.lblTotalCaption.Location = new System.Drawing.Point(8, 72);
+            this.lblTotalCaption.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lblTotalCaption.Name = "lblTotalCaption";
-            this.lblTotalCaption.Size = new System.Drawing.Size(52, 21);
+            this.lblTotalCaption.Size = new System.Drawing.Size(43, 17);
             this.lblTotalCaption.TabIndex = 8;
             this.lblTotalCaption.Text = "Total:";
             // 
@@ -195,9 +267,10 @@ namespace SmartTenderWindowTenderSplit.Forms
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lblMissingValue.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Bold);
             this.lblMissingValue.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(211)))), ((int)(((byte)(47)))), ((int)(((byte)(47)))));
-            this.lblMissingValue.Location = new System.Drawing.Point(137, 59);
+            this.lblMissingValue.Location = new System.Drawing.Point(103, 48);
+            this.lblMissingValue.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lblMissingValue.Name = "lblMissingValue";
-            this.lblMissingValue.Size = new System.Drawing.Size(389, 20);
+            this.lblMissingValue.Size = new System.Drawing.Size(234, 16);
             this.lblMissingValue.TabIndex = 7;
             this.lblMissingValue.Text = "0,00 €";
             this.lblMissingValue.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -207,9 +280,10 @@ namespace SmartTenderWindowTenderSplit.Forms
             this.lblMissingCaption.AutoSize = true;
             this.lblMissingCaption.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Bold);
             this.lblMissingCaption.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(211)))), ((int)(((byte)(47)))), ((int)(((byte)(47)))));
-            this.lblMissingCaption.Location = new System.Drawing.Point(12, 58);
+            this.lblMissingCaption.Location = new System.Drawing.Point(9, 47);
+            this.lblMissingCaption.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lblMissingCaption.Name = "lblMissingCaption";
-            this.lblMissingCaption.Size = new System.Drawing.Size(77, 21);
+            this.lblMissingCaption.Size = new System.Drawing.Size(63, 17);
             this.lblMissingCaption.TabIndex = 6;
             this.lblMissingCaption.Text = "Em falta:";
             // 
@@ -222,9 +296,10 @@ namespace SmartTenderWindowTenderSplit.Forms
             this.btnConfirm.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnConfirm.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Bold);
             this.btnConfirm.ForeColor = System.Drawing.Color.White;
-            this.btnConfirm.Location = new System.Drawing.Point(386, 126);
+            this.btnConfirm.Location = new System.Drawing.Point(232, 103);
+            this.btnConfirm.Margin = new System.Windows.Forms.Padding(2);
             this.btnConfirm.Name = "btnConfirm";
-            this.btnConfirm.Size = new System.Drawing.Size(140, 62);
+            this.btnConfirm.Size = new System.Drawing.Size(105, 50);
             this.btnConfirm.TabIndex = 11;
             this.btnConfirm.Text = "OK";
             this.btnConfirm.UseVisualStyleBackColor = false;
@@ -237,9 +312,10 @@ namespace SmartTenderWindowTenderSplit.Forms
             this.btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnCancel.Font = new System.Drawing.Font("Segoe UI", 10F);
             this.btnCancel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(211)))), ((int)(((byte)(47)))), ((int)(((byte)(47)))));
-            this.btnCancel.Location = new System.Drawing.Point(14, 127);
+            this.btnCancel.Location = new System.Drawing.Point(10, 103);
+            this.btnCancel.Margin = new System.Windows.Forms.Padding(2);
             this.btnCancel.Name = "btnCancel";
-            this.btnCancel.Size = new System.Drawing.Size(130, 62);
+            this.btnCancel.Size = new System.Drawing.Size(98, 49);
             this.btnCancel.TabIndex = 10;
             this.btnCancel.Text = "Cancelar";
             this.btnCancel.UseVisualStyleBackColor = false;
@@ -249,66 +325,12 @@ namespace SmartTenderWindowTenderSplit.Forms
             // 
             this.lblDeliveredCaption.AutoSize = true;
             this.lblDeliveredCaption.Font = new System.Drawing.Font("Segoe UI", 9.5F);
-            this.lblDeliveredCaption.Location = new System.Drawing.Point(12, 29);
+            this.lblDeliveredCaption.Location = new System.Drawing.Point(9, 24);
+            this.lblDeliveredCaption.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lblDeliveredCaption.Name = "lblDeliveredCaption";
-            this.lblDeliveredCaption.Size = new System.Drawing.Size(115, 21);
+            this.lblDeliveredCaption.Size = new System.Drawing.Size(97, 17);
             this.lblDeliveredCaption.TabIndex = 4;
             this.lblDeliveredCaption.Text = "Valor entregue:";
-            // 
-            // lblCategory
-            // 
-            this.lblCategory.AutoSize = true;
-            this.lblCategory.Font = new System.Drawing.Font("Segoe UI", 8F, System.Drawing.FontStyle.Bold);
-            this.lblCategory.ForeColor = System.Drawing.Color.Gray;
-            this.lblCategory.Location = new System.Drawing.Point(10, 10);
-            this.lblCategory.Name = "lblCategory";
-            this.lblCategory.Size = new System.Drawing.Size(164, 19);
-            this.lblCategory.TabIndex = 0;
-            this.lblCategory.Text = "MEIOS DE PAGAMENTO";
-            // 
-            // panelList
-            // 
-            this.panelList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.panelList.AutoScroll = true;
-            this.panelList.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panelList.Location = new System.Drawing.Point(10, 34);
-            this.panelList.Name = "panelList";
-            this.panelList.Size = new System.Drawing.Size(516, 266);
-            this.panelList.TabIndex = 1;
-            // 
-            // btnNavUp
-            // 
-            this.btnNavUp.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnNavUp.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(76)))), ((int)(((byte)(175)))), ((int)(((byte)(80)))));
-            this.btnNavUp.FlatAppearance.BorderSize = 0;
-            this.btnNavUp.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnNavUp.Font = new System.Drawing.Font("Segoe UI", 12F);
-            this.btnNavUp.ForeColor = System.Drawing.Color.White;
-            this.btnNavUp.Location = new System.Drawing.Point(10, 306);
-            this.btnNavUp.Name = "btnNavUp";
-            this.btnNavUp.Size = new System.Drawing.Size(90, 36);
-            this.btnNavUp.TabIndex = 2;
-            this.btnNavUp.Text = "▲";
-            this.btnNavUp.UseVisualStyleBackColor = false;
-            this.btnNavUp.Click += new System.EventHandler(this.btnNavUp_Click);
-            // 
-            // btnNavDown
-            // 
-            this.btnNavDown.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnNavDown.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(76)))), ((int)(((byte)(175)))), ((int)(((byte)(80)))));
-            this.btnNavDown.FlatAppearance.BorderSize = 0;
-            this.btnNavDown.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnNavDown.Font = new System.Drawing.Font("Segoe UI", 12F);
-            this.btnNavDown.ForeColor = System.Drawing.Color.White;
-            this.btnNavDown.Location = new System.Drawing.Point(106, 306);
-            this.btnNavDown.Name = "btnNavDown";
-            this.btnNavDown.Size = new System.Drawing.Size(90, 36);
-            this.btnNavDown.TabIndex = 3;
-            this.btnNavDown.Text = "▼";
-            this.btnNavDown.UseVisualStyleBackColor = false;
-            this.btnNavDown.Click += new System.EventHandler(this.btnNavDown_Click);
             // 
             // panelNumpad
             // 
@@ -327,9 +349,10 @@ namespace SmartTenderWindowTenderSplit.Forms
             this.panelNumpad.Controls.Add(this.btn0);
             this.panelNumpad.Controls.Add(this.btnDot);
             this.panelNumpad.Dock = System.Windows.Forms.DockStyle.Right;
-            this.panelNumpad.Location = new System.Drawing.Point(538, 52);
+            this.panelNumpad.Location = new System.Drawing.Point(346, 42);
+            this.panelNumpad.Margin = new System.Windows.Forms.Padding(2);
             this.panelNumpad.Name = "panelNumpad";
-            this.panelNumpad.Size = new System.Drawing.Size(282, 549);
+            this.panelNumpad.Size = new System.Drawing.Size(212, 445);
             this.panelNumpad.TabIndex = 1;
             // 
             // btn1
@@ -339,9 +362,10 @@ namespace SmartTenderWindowTenderSplit.Forms
             this.btn1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btn1.Font = new System.Drawing.Font("Segoe UI", 20F, System.Drawing.FontStyle.Bold);
             this.btn1.ForeColor = System.Drawing.Color.Black;
-            this.btn1.Location = new System.Drawing.Point(15, 252);
+            this.btn1.Location = new System.Drawing.Point(11, 205);
+            this.btn1.Margin = new System.Windows.Forms.Padding(2);
             this.btn1.Name = "btn1";
-            this.btn1.Size = new System.Drawing.Size(79, 103);
+            this.btn1.Size = new System.Drawing.Size(59, 84);
             this.btn1.TabIndex = 0;
             this.btn1.Text = "1";
             this.btn1.UseVisualStyleBackColor = false;
@@ -354,9 +378,10 @@ namespace SmartTenderWindowTenderSplit.Forms
             this.btn2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btn2.Font = new System.Drawing.Font("Segoe UI", 20F, System.Drawing.FontStyle.Bold);
             this.btn2.ForeColor = System.Drawing.Color.Black;
-            this.btn2.Location = new System.Drawing.Point(102, 252);
+            this.btn2.Location = new System.Drawing.Point(76, 205);
+            this.btn2.Margin = new System.Windows.Forms.Padding(2);
             this.btn2.Name = "btn2";
-            this.btn2.Size = new System.Drawing.Size(79, 103);
+            this.btn2.Size = new System.Drawing.Size(59, 84);
             this.btn2.TabIndex = 1;
             this.btn2.Text = "2";
             this.btn2.UseVisualStyleBackColor = false;
@@ -369,9 +394,10 @@ namespace SmartTenderWindowTenderSplit.Forms
             this.btn3.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btn3.Font = new System.Drawing.Font("Segoe UI", 20F, System.Drawing.FontStyle.Bold);
             this.btn3.ForeColor = System.Drawing.Color.Black;
-            this.btn3.Location = new System.Drawing.Point(189, 252);
+            this.btn3.Location = new System.Drawing.Point(142, 205);
+            this.btn3.Margin = new System.Windows.Forms.Padding(2);
             this.btn3.Name = "btn3";
-            this.btn3.Size = new System.Drawing.Size(79, 103);
+            this.btn3.Size = new System.Drawing.Size(59, 84);
             this.btn3.TabIndex = 2;
             this.btn3.Text = "3";
             this.btn3.UseVisualStyleBackColor = false;
@@ -384,9 +410,10 @@ namespace SmartTenderWindowTenderSplit.Forms
             this.btnBackspace.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnBackspace.Font = new System.Drawing.Font("Segoe UI", 20F, System.Drawing.FontStyle.Bold);
             this.btnBackspace.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(211)))), ((int)(((byte)(47)))), ((int)(((byte)(47)))));
-            this.btnBackspace.Location = new System.Drawing.Point(17, 365);
+            this.btnBackspace.Location = new System.Drawing.Point(13, 297);
+            this.btnBackspace.Margin = new System.Windows.Forms.Padding(2);
             this.btnBackspace.Name = "btnBackspace";
-            this.btnBackspace.Size = new System.Drawing.Size(79, 103);
+            this.btnBackspace.Size = new System.Drawing.Size(59, 84);
             this.btnBackspace.TabIndex = 3;
             this.btnBackspace.Text = "⌫";
             this.btnBackspace.UseVisualStyleBackColor = false;
@@ -399,9 +426,10 @@ namespace SmartTenderWindowTenderSplit.Forms
             this.btn4.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btn4.Font = new System.Drawing.Font("Segoe UI", 20F, System.Drawing.FontStyle.Bold);
             this.btn4.ForeColor = System.Drawing.Color.Black;
-            this.btn4.Location = new System.Drawing.Point(15, 143);
+            this.btn4.Location = new System.Drawing.Point(11, 116);
+            this.btn4.Margin = new System.Windows.Forms.Padding(2);
             this.btn4.Name = "btn4";
-            this.btn4.Size = new System.Drawing.Size(79, 103);
+            this.btn4.Size = new System.Drawing.Size(59, 84);
             this.btn4.TabIndex = 4;
             this.btn4.Text = "4";
             this.btn4.UseVisualStyleBackColor = false;
@@ -414,9 +442,10 @@ namespace SmartTenderWindowTenderSplit.Forms
             this.btn5.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btn5.Font = new System.Drawing.Font("Segoe UI", 20F, System.Drawing.FontStyle.Bold);
             this.btn5.ForeColor = System.Drawing.Color.Black;
-            this.btn5.Location = new System.Drawing.Point(102, 143);
+            this.btn5.Location = new System.Drawing.Point(76, 116);
+            this.btn5.Margin = new System.Windows.Forms.Padding(2);
             this.btn5.Name = "btn5";
-            this.btn5.Size = new System.Drawing.Size(79, 103);
+            this.btn5.Size = new System.Drawing.Size(59, 84);
             this.btn5.TabIndex = 5;
             this.btn5.Text = "5";
             this.btn5.UseVisualStyleBackColor = false;
@@ -429,9 +458,10 @@ namespace SmartTenderWindowTenderSplit.Forms
             this.btn6.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btn6.Font = new System.Drawing.Font("Segoe UI", 20F, System.Drawing.FontStyle.Bold);
             this.btn6.ForeColor = System.Drawing.Color.Black;
-            this.btn6.Location = new System.Drawing.Point(189, 143);
+            this.btn6.Location = new System.Drawing.Point(142, 116);
+            this.btn6.Margin = new System.Windows.Forms.Padding(2);
             this.btn6.Name = "btn6";
-            this.btn6.Size = new System.Drawing.Size(79, 103);
+            this.btn6.Size = new System.Drawing.Size(59, 84);
             this.btn6.TabIndex = 6;
             this.btn6.Text = "6";
             this.btn6.UseVisualStyleBackColor = false;
@@ -444,9 +474,10 @@ namespace SmartTenderWindowTenderSplit.Forms
             this.btnNumOk.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnNumOk.Font = new System.Drawing.Font("Segoe UI", 16F, System.Drawing.FontStyle.Bold);
             this.btnNumOk.ForeColor = System.Drawing.Color.White;
-            this.btnNumOk.Location = new System.Drawing.Point(17, 474);
+            this.btnNumOk.Location = new System.Drawing.Point(13, 385);
+            this.btnNumOk.Margin = new System.Windows.Forms.Padding(2);
             this.btnNumOk.Name = "btnNumOk";
-            this.btnNumOk.Size = new System.Drawing.Size(251, 62);
+            this.btnNumOk.Size = new System.Drawing.Size(188, 50);
             this.btnNumOk.TabIndex = 7;
             this.btnNumOk.Text = "OK";
             this.btnNumOk.UseVisualStyleBackColor = false;
@@ -459,9 +490,10 @@ namespace SmartTenderWindowTenderSplit.Forms
             this.btn7.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btn7.Font = new System.Drawing.Font("Segoe UI", 20F, System.Drawing.FontStyle.Bold);
             this.btn7.ForeColor = System.Drawing.Color.Black;
-            this.btn7.Location = new System.Drawing.Point(15, 34);
+            this.btn7.Location = new System.Drawing.Point(11, 28);
+            this.btn7.Margin = new System.Windows.Forms.Padding(2);
             this.btn7.Name = "btn7";
-            this.btn7.Size = new System.Drawing.Size(79, 103);
+            this.btn7.Size = new System.Drawing.Size(59, 84);
             this.btn7.TabIndex = 8;
             this.btn7.Text = "7";
             this.btn7.UseVisualStyleBackColor = false;
@@ -474,9 +506,10 @@ namespace SmartTenderWindowTenderSplit.Forms
             this.btn8.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btn8.Font = new System.Drawing.Font("Segoe UI", 20F, System.Drawing.FontStyle.Bold);
             this.btn8.ForeColor = System.Drawing.Color.Black;
-            this.btn8.Location = new System.Drawing.Point(102, 34);
+            this.btn8.Location = new System.Drawing.Point(76, 28);
+            this.btn8.Margin = new System.Windows.Forms.Padding(2);
             this.btn8.Name = "btn8";
-            this.btn8.Size = new System.Drawing.Size(79, 103);
+            this.btn8.Size = new System.Drawing.Size(59, 84);
             this.btn8.TabIndex = 9;
             this.btn8.Text = "8";
             this.btn8.UseVisualStyleBackColor = false;
@@ -489,9 +522,10 @@ namespace SmartTenderWindowTenderSplit.Forms
             this.btn9.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btn9.Font = new System.Drawing.Font("Segoe UI", 20F, System.Drawing.FontStyle.Bold);
             this.btn9.ForeColor = System.Drawing.Color.Black;
-            this.btn9.Location = new System.Drawing.Point(189, 34);
+            this.btn9.Location = new System.Drawing.Point(142, 28);
+            this.btn9.Margin = new System.Windows.Forms.Padding(2);
             this.btn9.Name = "btn9";
-            this.btn9.Size = new System.Drawing.Size(79, 103);
+            this.btn9.Size = new System.Drawing.Size(59, 84);
             this.btn9.TabIndex = 10;
             this.btn9.Text = "9";
             this.btn9.UseVisualStyleBackColor = false;
@@ -504,9 +538,10 @@ namespace SmartTenderWindowTenderSplit.Forms
             this.btn0.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btn0.Font = new System.Drawing.Font("Segoe UI", 20F, System.Drawing.FontStyle.Bold);
             this.btn0.ForeColor = System.Drawing.Color.Black;
-            this.btn0.Location = new System.Drawing.Point(102, 365);
+            this.btn0.Location = new System.Drawing.Point(76, 297);
+            this.btn0.Margin = new System.Windows.Forms.Padding(2);
             this.btn0.Name = "btn0";
-            this.btn0.Size = new System.Drawing.Size(79, 103);
+            this.btn0.Size = new System.Drawing.Size(59, 84);
             this.btn0.TabIndex = 11;
             this.btn0.Text = "0";
             this.btn0.UseVisualStyleBackColor = false;
@@ -519,23 +554,40 @@ namespace SmartTenderWindowTenderSplit.Forms
             this.btnDot.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnDot.Font = new System.Drawing.Font("Segoe UI", 20F, System.Drawing.FontStyle.Bold);
             this.btnDot.ForeColor = System.Drawing.Color.Black;
-            this.btnDot.Location = new System.Drawing.Point(189, 365);
+            this.btnDot.Location = new System.Drawing.Point(142, 297);
+            this.btnDot.Margin = new System.Windows.Forms.Padding(2);
             this.btnDot.Name = "btnDot";
-            this.btnDot.Size = new System.Drawing.Size(79, 103);
+            this.btnDot.Size = new System.Drawing.Size(59, 84);
             this.btnDot.TabIndex = 12;
             this.btnDot.Text = ".";
             this.btnDot.UseVisualStyleBackColor = false;
             this.btnDot.Click += new System.EventHandler(this.OnNumpadClick);
             // 
+            // colTenderName
+            // 
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.colTenderName.DefaultCellStyle = dataGridViewCellStyle3;
+            this.colTenderName.HeaderText = "Modalidade";
+            this.colTenderName.Name = "colTenderName";
+            this.colTenderName.ReadOnly = true;
+            // 
+            // colAmount
+            // 
+            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.colAmount.DefaultCellStyle = dataGridViewCellStyle4;
+            this.colAmount.HeaderText = "Valor (€)";
+            this.colAmount.Name = "colAmount";
+            // 
             // TenderSplitDialog
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(820, 601);
+            this.ClientSize = new System.Drawing.Size(558, 487);
             this.Controls.Add(this.panelLeft);
             this.Controls.Add(this.panelNumpad);
             this.Controls.Add(this.panelHeader);
             this.KeyPreview = true;
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.MinimizeBox = false;
             this.Name = "TenderSplitDialog";
             this.ShowIcon = false;
@@ -544,7 +596,8 @@ namespace SmartTenderWindowTenderSplit.Forms
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TenderSplitDialog_KeyDown);
             this.panelHeader.ResumeLayout(false);
             this.panelLeft.ResumeLayout(false);
-            this.panelLeft.PerformLayout();
+            this.panelLeftTopBottom.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dgvTenders)).EndInit();
             this.panelLeftBottom.ResumeLayout(false);
             this.panelLeftBottom.PerformLayout();
             this.panelNumpad.ResumeLayout(false);
@@ -554,5 +607,9 @@ namespace SmartTenderWindowTenderSplit.Forms
 
         private System.Windows.Forms.Panel panelLeftBottom;
         private System.Windows.Forms.Button btnDetails;
+        private DataGridView dgvTenders;
+        private Panel panelLeftTopBottom;
+        private DataGridViewTextBoxColumn colTenderName;
+        private DataGridViewTextBoxColumn colAmount;
     }
 }

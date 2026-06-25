@@ -22,13 +22,11 @@ namespace SmartTenderWindowTenderSplit.Forms
         private int    _selectedIndex = -1;
         private string _inputBuffer   = "0";
 
-        // ── Dynamic UI ───────────────────────────────────────────────────────
-        private Panel[] _tenderRows;
-        private Label[] _tenderAmountLabels;
-
         // Per-tender extra details captured via popups. Holds a BankTransferDetails,
         // CheckDetails or CreditNoteRefundDetails, or null when none / not applicable.
         private readonly object[] _details;
+
+        private bool _updatingGrid = false;  // Flag to prevent recursive updates when programmatically changing grid cells
 
         public TenderSplitResult Result { get; private set; }
 
@@ -55,7 +53,8 @@ namespace SmartTenderWindowTenderSplit.Forms
             lblTotalValue.Text = FormatCurrency(_documentTotal);
             lblMissingValue.Text = FormatCurrency(_documentTotal);
 
-            BuildTenderRows();
+            WireUpNumpadButtonHandlers();
+            BuildTenderGrid();
             SelectTender(0);
         }
 
@@ -74,67 +73,166 @@ namespace SmartTenderWindowTenderSplit.Forms
             }
         }
 
-        // ── Dynamic tender rows ──────────────────────────────────────────────
+        // ── Numpad button setup ──────────────────────────────────────────────
 
-        private void BuildTenderRows()
+        private void WireUpNumpadButtonHandlers()
         {
-            _tenderRows         = new Panel[_tenders.Count];
-            _tenderAmountLabels = new Label[_tenders.Count];
+            // Disable TabStop on all buttons so they don't consume Enter/Tab and interfere with keyboard input
+            var allButtons = new[] {
+                btn0, btn1, btn2, btn3, btn4, btn5, btn6, btn7, btn8, btn9, btnDot, btnBackspace, btnNumOk,
+                btnNavUp, btnNavDown, btnConfirm, btnCancel
+            };
+            foreach (var btn in allButtons)
+                btn.TabStop = false;
 
-            panelList.SuspendLayout();
+            var numpadButtons = new[] { btn0, btn1, btn2, btn3, btn4, btn5, btn6, btn7, btn8, btn9, btnDot, btnBackspace };
+            foreach (var btn in numpadButtons)
+                btn.KeyDown += NumpadButton_KeyDown;
+        }
 
+        // ── DataGridView setup ──────────────────────────────────────────────────
+
+        private void BuildTenderGrid()
+        {
+            dgvTenders.AllowUserToDeleteRows = false;  // Prevent accidental row deletion
+
+            // Style header
+            dgvTenders.ColumnHeadersDefaultCellStyle.BackColor = ClrHeader;
+            dgvTenders.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
+            dgvTenders.ColumnHeadersDefaultCellStyle.Font = new Font(dgvTenders.Font, FontStyle.Bold);
+
+            // Style alternating rows
+            dgvTenders.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(240, 240, 240);
+            dgvTenders.DefaultCellStyle.BackColor = Color.White;
+
+            dgvTenders.Rows.Clear();
             for (int i = 0; i < _tenders.Count; i++)
             {
-                int idx = i;
+                var row = new DataGridViewRow();
+                row.CreateCells(dgvTenders);
+                row.Cells[0].Value = _tenders[i].Name;
+                row.Cells[1].Value = FormatCurrency(_amounts[i]);
+                dgvTenders.Rows.Add(row);
+            }
+            dgvTenders.CellValueChanged += DgvTenders_CellValueChanged;
+            dgvTenders.SelectionChanged += DgvTenders_SelectionChanged;
+            dgvTenders.PreviewKeyDown += DgvTenders_PreviewKeyDown;
+            dgvTenders.KeyDown += DgvTenders_KeyDown;
+        }
 
-                var row = new Panel
+        private void DgvTenders_SelectionChanged(object sender, EventArgs e)
+        {
+            if (dgvTenders.SelectedRows.Count > 0)
+            {
+                int index = dgvTenders.SelectedRows[0].Index;
+                SelectTender(index);
+            }
+        }
+
+        private void DgvTenders_CellValueChanged(object sender, DataGridViewCellEventArgs e)
+        {
+            if (_updatingGrid || e.ColumnIndex != 1) return;  // Only care about Amount column
+
+            int index = e.RowIndex;
+            string cellValue = (dgvTenders.Rows[index].Cells[1].Value?.ToString() ?? "0").Trim();
+
+            // Remove currency symbol if present
+            cellValue = cellValue.Replace("€", "").Trim();
+
+            // Normalize decimal separator: accept both comma and period
+            cellValue = cellValue.Replace(",", ".");
+
+            // Try to parse as decimal; if fails, reset to previous amount
+            if (decimal.TryParse(cellValue, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out decimal amount))
+            {
+                SetAmount(index, amount);
+                UpdateSummary();
+            }
+            else
+            {
+                _updatingGrid = true;
+                dgvTenders.Rows[index].Cells[1].Value = FormatCurrency(_amounts[index]);
+                _updatingGrid = false;
+            }
+        }
+
+        private void DgvTenders_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+        {
+            // Treat numeric keys as input keys so they go to the grid instead of the form
+            if ((e.KeyCode >= Keys.D0 && e.KeyCode <= Keys.D9) ||
+                (e.KeyCode >= Keys.NumPad0 && e.KeyCode <= Keys.NumPad9))
+            {
+                e.IsInputKey = true;
+            }
+        }
+
+        private void DgvTenders_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Delete && dgvTenders.IsCurrentCellInEditMode)
+            {
+                if (dgvTenders.EditingControl is TextBox textBox)
                 {
-                    Location  = new Point(0, i * 38),
-                    Size      = new Size(panelList.ClientSize.Width, 38),
-                    BackColor = Color.White,
-                    Cursor    = Cursors.Hand
-                };
-
-                var lblName = new Label
-                {
-                    Text      = _tenders[i].Name,
-                    Location  = new Point(10, 0),
-                    Size      = new Size(220, 38),
-                    Font      = new Font("Segoe UI", 9.5f),
-                    TextAlign = ContentAlignment.MiddleLeft,
-                    BackColor = Color.Transparent
-                };
-
-                var lblAmt = new Label
-                {
-                    Text      = FormatCurrency(_amounts[i]),
-                    Location  = new Point(240, 0),
-                    Size      = new Size(row.Width - 250, 38),
-                    Font      = new Font("Segoe UI", 9.5f, FontStyle.Bold),
-                    TextAlign = ContentAlignment.MiddleRight,
-                    BackColor = Color.Transparent,
-                    Anchor    = AnchorStyles.Top | AnchorStyles.Right
-                };
-
-                row.Click     += (s, e) => SelectTender(idx);
-                lblName.Click += (s, e) => SelectTender(idx);
-                lblAmt.Click  += (s, e) => SelectTender(idx);
-
-                row.Controls.Add(lblName);
-                row.Controls.Add(lblAmt);
-
-                _tenderRows[i]         = row;
-                _tenderAmountLabels[i] = lblAmt;
-                panelList.Controls.Add(row);
+                    if (textBox.SelectionLength > 0)
+                    {
+                        textBox.SelectedText = "";
+                        e.Handled = true;
+                        e.SuppressKeyPress = true;
+                    }
+                }
             }
 
-            panelList.AutoScrollMinSize = new Size(0, _tenders.Count * 38);
-            panelList.ClientSizeChanged += (s, e) =>
+            // Route number keys and special keys (Enter, Tab, Backspace) to the numpad handler
+            switch (e.KeyCode)
             {
-                foreach (var row in _tenderRows)
-                    row.Width = panelList.ClientSize.Width;
-            };
-            panelList.ResumeLayout();
+                case Keys.D0: case Keys.NumPad0: HandleNumpad("0"); e.Handled = true; break;
+                case Keys.D1: case Keys.NumPad1: HandleNumpad("1"); e.Handled = true; break;
+                case Keys.D2: case Keys.NumPad2: HandleNumpad("2"); e.Handled = true; break;
+                case Keys.D3: case Keys.NumPad3: HandleNumpad("3"); e.Handled = true; break;
+                case Keys.D4: case Keys.NumPad4: HandleNumpad("4"); e.Handled = true; break;
+                case Keys.D5: case Keys.NumPad5: HandleNumpad("5"); e.Handled = true; break;
+                case Keys.D6: case Keys.NumPad6: HandleNumpad("6"); e.Handled = true; break;
+                case Keys.D7: case Keys.NumPad7: HandleNumpad("7"); e.Handled = true; break;
+                case Keys.D8: case Keys.NumPad8: HandleNumpad("8"); e.Handled = true; break;
+                case Keys.D9: case Keys.NumPad9: HandleNumpad("9"); e.Handled = true; break;
+                case Keys.Back: HandleNumpad("⌫"); e.Handled = true; break;
+                case Keys.Delete:
+                    // Only handle Delete as backspace if NOT in edit mode; let TextBox handle it in edit mode
+                    if (!dgvTenders.IsCurrentCellInEditMode)
+                    {
+                        HandleNumpad("⌫");
+                        e.Handled = true;
+                    }
+                    break;
+                case Keys.Up: NavigateTender(-1); e.Handled = true; break;
+                case Keys.Down: NavigateTender(1); e.Handled = true; break;
+                case Keys.Tab: FinalizeInputAndOpenDetailsIfNeeded(); e.Handled = true; break;
+                case Keys.Enter: FinalizeInputAndOpenDetailsIfNeeded(); if (FirstMissingDetailIndex() < 0) Confirm(); e.Handled = true; break;
+                case Keys.Escape: btnCancel_Click(sender, e); e.Handled = true; break;
+            }
+        }
+
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            if (keyData == Keys.Delete && dgvTenders.IsCurrentCellInEditMode)
+            {
+                if (dgvTenders.EditingControl is TextBox textBox)
+                {
+                    if (textBox.SelectionLength > 0)
+                    {
+                        // Delete selected text
+                        textBox.SelectedText = "";
+                        return true;
+                    }
+                    else if (textBox.SelectionStart < textBox.Text.Length)
+                    {
+                        // Delete character at cursor position (to the right)
+                        textBox.Select(textBox.SelectionStart, 1);
+                        textBox.SelectedText = "";
+                        return true;
+                    }
+                }
+            }
+            return base.ProcessCmdKey(ref msg, keyData);
         }
 
         // ── Tender selection ─────────────────────────────────────────────────
@@ -142,28 +240,26 @@ namespace SmartTenderWindowTenderSplit.Forms
         private void SelectTender(int index)
         {
             if (index == _selectedIndex) return;
+
+            // Finalize input for the tender being left: auto-open details if needed.
+            FinalizeInputAndOpenDetailsIfNeeded();
+
             _selectedIndex = index;
             _inputBuffer   = AmountToBuffer(_amounts[index]);
 
-            for (int i = 0; i < _tenderRows.Length; i++)
+            // Select the row in the grid
+            dgvTenders.ClearSelection();
+            if (index >= 0 && index < dgvTenders.Rows.Count)
             {
-                bool sel = (i == index);
-                Color bg = sel ? ClrSelected : Color.White;
-                _tenderRows[i].BackColor = bg;
-                foreach (Control c in _tenderRows[i].Controls)
-                    c.BackColor = bg;
+                dgvTenders.Rows[index].Selected = true;
+                dgvTenders.FirstDisplayedScrollingRowIndex = index;
             }
 
             if (btnDetails != null)
                 btnDetails.Visible = RequiresPopup(_tenders[index].TenderType);
 
-            // Scroll selected row into view
-            int rowY   = index * 38;
-            int scrollY = -panelList.AutoScrollPosition.Y;
-            if (rowY < scrollY)
-                panelList.AutoScrollPosition = new Point(0, rowY);
-            else if (rowY + 38 > scrollY + panelList.ClientSize.Height)
-                panelList.AutoScrollPosition = new Point(0, rowY + 38 - panelList.ClientSize.Height);
+            // Ensure the form has focus so keyboard input works
+            this.Focus();
 
             UpdateSummary();
         }
@@ -203,8 +299,22 @@ namespace SmartTenderWindowTenderSplit.Forms
         }
 
         /// <summary>
+        /// Called when the user finalizes their input (Tab or clicks another field).
+        /// If the current tender has an amount > 0, requires a popup, and has no details yet,
+        /// automatically open the popup.
+        /// </summary>
+        private void FinalizeInputAndOpenDetailsIfNeeded()
+        {
+            if (_selectedIndex < 0 || _selectedIndex >= _tenders.Count) return;
+
+            var tender = _tenders[_selectedIndex];
+            if (_amounts[_selectedIndex] > 0 && RequiresPopup(tender.TenderType) && _details[_selectedIndex] == null)
+                OpenDetailsForSelected();
+        }
+
+        /// <summary>
         /// Applies <paramref name="value"/> to a tender, enforcing the MaxAmount cap and
-        /// (for non-change tenders) the document-total cap, then refreshes the row label
+        /// (for non-change tenders) the document-total cap, then refreshes the grid cell
         /// and the input buffer. Shared by numpad input and the detail popups.
         /// </summary>
         private void SetAmount(int index, decimal value)
@@ -218,7 +328,12 @@ namespace SmartTenderWindowTenderSplit.Forms
                 value = _documentTotal;
 
             _amounts[index] = value;
-            _tenderAmountLabels[index].Text = FormatCurrency(value);
+
+            // Update the grid cell
+            _updatingGrid = true;
+            dgvTenders.Rows[index].Cells[1].Value = FormatCurrency(value);
+            _updatingGrid = false;
+
             if (index == _selectedIndex)
                 _inputBuffer = AmountToBuffer(value);
         }
@@ -358,8 +473,22 @@ namespace SmartTenderWindowTenderSplit.Forms
 
         private void btnNavUp_Click(object sender, EventArgs e)   => NavigateTender(-1);
         private void btnNavDown_Click(object sender, EventArgs e)  => NavigateTender(1);
-        private void btnNumOk_Click(object sender, EventArgs e)    => Confirm();
-        private void btnConfirm_Click(object sender, EventArgs e)  => Confirm();
+        private void btnNumOk_Click(object sender, EventArgs e)
+        {
+            // End grid editing to commit any pending cell edits before finalizing
+            dgvTenders.EndEdit();
+
+            FinalizeInputAndOpenDetailsIfNeeded();
+            if (FirstMissingDetailIndex() < 0) Confirm();
+        }
+        private void btnConfirm_Click(object sender, EventArgs e)
+        {
+            // End grid editing to commit any pending cell edits before finalizing
+            dgvTenders.EndEdit();
+
+            FinalizeInputAndOpenDetailsIfNeeded();
+            if (FirstMissingDetailIndex() < 0) Confirm();
+        }
 
         private void btnCancel_Click(object sender, EventArgs e)
         {
@@ -373,6 +502,19 @@ namespace SmartTenderWindowTenderSplit.Forms
 
         private void btnBackspace_Click(object sender, EventArgs e)
             => HandleNumpad("⌫");
+
+        /// <summary>
+        /// Suppress Enter and Tab on numpad buttons so they're handled by the form's KeyDown,
+        /// not by the button click handlers.
+        /// </summary>
+        private void NumpadButton_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter || e.KeyCode == Keys.Tab)
+            {
+                e.Handled = true;
+                e.SuppressKeyPress = true;
+            }
+        }
 
         private void TenderSplitDialog_KeyDown(object sender, KeyEventArgs e)
         {
@@ -392,7 +534,11 @@ namespace SmartTenderWindowTenderSplit.Forms
                 case Keys.Delete:  HandleNumpad("⌫");   break;
                 case Keys.Up:      NavigateTender(-1);  break;
                 case Keys.Down:    NavigateTender(1);   break;
-                case Keys.Enter:   Confirm();            break;
+                case Keys.Tab:     FinalizeInputAndOpenDetailsIfNeeded(); break;
+                case Keys.Enter:
+                    FinalizeInputAndOpenDetailsIfNeeded();
+                    if (FirstMissingDetailIndex() < 0) Confirm();
+                    break;
                 case Keys.Escape:  btnCancel_Click(sender, e); break;
                 default: return;
             }
