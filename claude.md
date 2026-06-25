@@ -12,32 +12,47 @@ smart-tender-window/
 │   ├── Properties/
 │   │   └── AssemblyInfo.cs
 │   ├── Forms/
-│   │   ├── TenderSplitDialog.cs          # Main dialog – logic & event handling
-│   │   ├── TenderSplitDialog.Designer.cs # Designer-generated UI layout
-│   │   └── TenderSplitDialog.resx
+│   │   ├── TenderSplitDialog.cs              # Main dialog – logic & event handling
+│   │   ├── TenderSplitDialog.Designer.cs     # Designer-generated UI layout
+│   │   ├── TenderSplitDialog.resx
+│   │   ├── BankTransferDialog.cs             # Popup for wire transfer details
+│   │   ├── BankTransferDialog.Designer.cs
+│   │   ├── BankTransferDialog.resx
+│   │   ├── CheckDialog.cs                    # Popup for check details
+│   │   ├── CheckDialog.Designer.cs
+│   │   ├── CheckDialog.resx
+│   │   ├── CreditNoteRefundDialog.cs         # Popup for voucher/credit note details
+│   │   ├── CreditNoteRefundDialog.Designer.cs
+│   │   └── CreditNoteRefundDialog.resx
 │   ├── Models/
-│   │   ├── TenderItem.cs                 # Represents one payment method
-│   │   ├── TenderAllocation.cs           # Amount allocated to a single tender
-│   │   └── TenderSplitResult.cs          # Full result returned on confirmation
-│   └── SmartTenderWindow.csproj          # .NET Framework 4.7.2, old-style csproj
+│   │   ├── TenderTypeEnum.cs                 # Payment method types (cash, card, check, wire, etc.)
+│   │   ├── TenderItem.cs                     # Represents one payment method
+│   │   ├── TenderAllocation.cs               # Amount + details for a single tender
+│   │   ├── TenderSplitResult.cs              # Full result returned on confirmation
+│   │   ├── BankTransferDetails.cs            # Wire transfer details (account, reference, date)
+│   │   ├── CheckDetails.cs                   # Check details (number, bank, date, amount)
+│   │   ├── CreditNoteRefundDetails.cs        # Credit note details (serial, doc#, amounts)
+│   │   ├── TenderOption.cs                   # Dropdown option (Id + display text)
+│   │   └── SmartTenderWindow.csproj          # .NET Framework 4.7.2, old-style csproj
 │
 ├── SmartTenderWindow.Windows/                # WinForms test harness (WinExe)
-│   ├── MainForm.cs                       # UI to pick tender count & document total
+│   ├── MainForm.cs                           # UI to pick tender count & document total
 │   ├── MainForm.Designer.cs
 │   ├── Program.cs
 │   └── SmartTenderWindow.Windows.csproj
 │
 ├── SmartTenderWindow.Tests/                  # MSTest unit test project
 │   ├── Helpers/
-│   │   ├── StaHelper.cs                  # Runs actions on STA thread (required for WinForms)
-│   │   └── ReflectionHelper.cs           # Invokes private methods/fields by name
+│   │   ├── StaHelper.cs                      # Runs actions on STA thread (required for WinForms)
+│   │   └── ReflectionHelper.cs               # Invokes private methods/fields by name
 │   ├── Models/
-│   │   ├── TenderItemTests.cs            # 14 tests
-│   │   ├── TenderAllocationTests.cs      # 5 tests
-│   │   └── TenderSplitResultTests.cs     # 5 tests
+│   │   ├── TenderItemTests.cs                # 14 tests
+│   │   ├── TenderAllocationTests.cs          # 12 tests (added detail property tests)
+│   │   └── TenderSplitResultTests.cs         # 5 tests
 │   ├── Forms/
-│   │   └── TenderSplitDialogTests.cs     # 32 tests
-│   └── SmartTenderWindow.Tests.csproj    # SDK-style, net472, MSTest 3.1.1
+│   │   ├── TenderSplitDialogTests.cs         # 33 tests (added end-to-end test)
+│   │   └── TenderDetailDialogsTests.cs       # 7 tests (popup dialogs & details)
+│   └── SmartTenderWindow.Tests.csproj        # SDK-style, net472, MSTest 3.1.1
 │
 ├── SmartTenderWindow.slnx                    # Solution (all three projects)
 ├── bin/Debug/
@@ -62,7 +77,8 @@ TenderSplitDialog(IEnumerable<TenderItem> tenders, decimal documentTotal)
 - Throws `ArgumentException` when `tenders` is empty.
 - Throws `ArgumentOutOfRangeException` when `documentTotal` ≤ 0.
 - Preloads `_amounts[]` from each `TenderItem.PreloadedAmount`.
-- Calls `BuildTenderRows()` then `SelectTender(0)`.
+- Calls `BuildTenderGrid()` then `SelectTender(0)`.
+- First tender auto-selected on open for convenience.
 
 #### Static convenience method
 
@@ -77,13 +93,16 @@ Shows the dialog modally. Returns a `TenderSplitResult` on confirmation, or `nul
 
 | Method | Description |
 |---|---|
-| `BuildTenderRows()` | Dynamically creates one `Panel` row (name label + amount label) per `TenderItem`. Hooks `ClientSizeChanged` to keep row widths in sync when the scrollbar appears/disappears. |
-| `SelectTender(int index)` | Highlights the selected row (green), syncs `_inputBuffer` to the current amount, scrolls the row into view. No-op when index equals `_selectedIndex`. |
-| `NavigateTender(int delta)` | Moves selection by `delta`, clamped to `[0, count-1]`. |
+| `BuildTenderGrid()` | Dynamically creates a DataGridView with two columns (Tender Name, Amount). Applies styling: green header, alternating row colors (white/light gray). Sets `TabStop=false` so grid doesn't steal focus. Wires up cell editing, selection, and keyboard handlers. |
+| `SelectTender(int index)` | Highlights the selected row in grid, syncs `_inputBuffer` to the current amount. Shows Details button if tender type requires popup. No-op when index equals `_selectedIndex`. |
+| `NavigateTender(int delta)` | Moves selection by `delta`, clamped to `[0, count-1]`. Scrolls grid to keep selected row visible. |
 | `HandleNumpad(string key)` | Cash-register input: digits append right, `"⌫"` removes last digit (floors to `"0"`), `"."` is a no-op (2 decimal places are implied). Calls `CommitBuffer()`. |
 | `CommitBuffer()` | Parses `_inputBuffer` as `raw / 100m`. Enforces `MaxAmount` cap, then enforces `documentTotal` cap for `AllowsChange = false` tenders. |
 | `UpdateSummary()` | Recalculates delivered / missing. Shows **"Em falta:"** (red) when underpaid, **"Troco:"** (green) when overpaid or exact. Enables/disables `btnConfirm`. |
-| `Confirm()` | Guards against underpayment. Builds `TenderSplitResult` (only allocations with Amount > 0), sets `DialogResult = OK`. |
+| `Confirm()` | Guards against underpayment and missing details. Builds `TenderSplitResult` with allocations (only Amount > 0) carrying captured details, sets `DialogResult = OK`. |
+| `FinalizeInputAndOpenDetailsIfNeeded()` | Commits current amount and auto-opens popup dialog for tenders requiring details (wire, check, voucher). |
+| `FirstMissingDetailIndex()` | Returns index of first tender with Amount > 0 but missing required details, or -1 if all complete. |
+| `RequiresPopup(TenderTypeEnum?)` | Returns true for `tndBankWireTransfer`, `tndCheck`, `tndVoucher`; false otherwise. |
 | `FormatCurrency(decimal)` | Returns `value.ToString("N2") + " €"`. |
 | `AmountToBuffer(decimal)` | Returns `((long)(value * 100)).ToString()`, or `"0"` for zero. |
 
@@ -93,20 +112,54 @@ Shows the dialog modally. Returns a `TenderSplitResult` on confirmation, or `nul
 ┌────────────────────────────────────────────────────────────┐
 │  [Green header]  Title               Total: 37,50 €        │  52px, DockStyle.Top
 ├──────────────────────────────────────────┬─────────────────┤
-│  [Scrollable tender list]                │  [7] [8] [9]    │
-│   Numerário              0,00 €  ◄ sel  │  [4] [5] [6]    │
-│   Cartão                 0,00 €          │  [1] [2] [3]    │
-│   …                                      │  [⌫] [0] [.]    │
-│                                          │  [    OK    ]   │
-│  Valor entregue:  0,00 €                 │                 │
-│  Em falta:       37,50 €                 │                 │  370px numpad, DockStyle.Right
+│  [DataGridView: tender list]             │  [7] [8] [9]    │
+│  ┌─ Modalidade ──────────┬─ Valor (€) ┐  │  [4] [5] [6]    │
+│  │ Numerário             │ 0,00 €     │  │  [1] [2] [3]    │
+│  │ Cartão                │ 0,00 €     │  │  [⌫] [0] [.]    │
+│  │ …                     │ …          │  │  [    OK    ]   │
+│  └───────────────────────┴────────────┘  │                 │
+│  [▲] [▼]                                 │  370px numpad,  │
+│  Valor entregue:  0,00 €                 │  DockStyle.Right│
+│  Em falta:       37,50 €                 │                 │
 │  Total:          37,50 €                 │                 │
-│  [▲] [▼]   [Confirmar (gray)]  [Cancelar]│                 │
+│  [Confirmar]  [Cancelar]  [Detalhes]     │                 │
 └──────────────────────────────────────────┴─────────────────┘
 ```
 
+**Features:**
 - `FormBorderStyle.Sizable`, `WindowState.Maximized`, `KeyPreview = true`
-- Keyboard: 0–9, Backspace/Delete → numpad; ↑/↓ → navigate; Enter → confirm; Escape → cancel
+- DataGridView with green header, alternating row colors (white/light gray)
+- Delete key deletes selected text in cells (via `ProcessCmdKey` override)
+- Grid TabStop=false prevents focus stealing; OK button stays focused
+- Click rows to select; arrow buttons navigate and scroll to keep row visible
+- Keyboard: 0–9 → numpad; Backspace → delete digit; Delete (in cell) → delete selected text; ↑/↓ → navigate; Enter → confirm; Escape → cancel
+- When OK clicked with no amount entered, fills selected tender with full document total
+
+---
+
+### `Models/TenderTypeEnum.cs`
+
+```csharp
+public enum TenderTypeEnum
+{
+    tndCash = 0,
+    tndCreditDebitCard = 1,
+    tndMBWay = 2,
+    tndBankWireTransfer = 4,
+    tndCheck = 5,
+    tndRefMB = 6,
+    tndVoucher = 7,
+    tndCreditNote = 8,
+    tndDebitNote = 9,
+    tndCompensation = 10,
+    tndWallet = 11,
+    tndAdvance = 13,
+    tndCustomerAdvance = 14,
+    tndStandardizedVoucher = 15
+}
+```
+
+Maps payment method types to Sage 50c tender codes.
 
 ---
 
@@ -115,15 +168,21 @@ Shows the dialog modally. Returns a `TenderSplitResult` on confirmation, or `nul
 ```csharp
 public class TenderItem
 {
-    public string Id { get; set; }
+    public TenderTypeEnum? TenderType { get; set; }
     public string Name { get; set; }
     public decimal PreloadedAmount { get; set; }   // Default starting value (default 0)
     public decimal? MaxAmount { get; set; }         // Optional hard cap (default null)
     public bool AllowsChange { get; set; }          // true = overpayment → change; false = capped at total
+    
+    // For special tender types requiring popup details
+    public List<TenderOption> BeneficiaryAccounts { get; set; }  // For wire transfers
+    public List<TenderOption> PartyAccounts { get; set; }        // For wire transfers
+    public List<TenderOption> Banks { get; set; }                // For checks
+    public List<TenderOption> Series { get; set; }               // For vouchers/credit notes
 }
 ```
 
-Two-arg constructor throws `ArgumentException` when `Id` or `Name` is null/empty/whitespace. Default (no-arg) constructor also available.
+Two-arg constructor throws `ArgumentException` when `Name` is null/empty/whitespace. Default (no-arg) constructor also available.
 
 ---
 
@@ -134,6 +193,66 @@ public class TenderAllocation
 {
     public TenderItem Tender { get; set; }
     public decimal Amount { get; set; }
+    
+    // Details for special tender types (only one populated per allocation)
+    public BankTransferDetails BankTransfer { get; set; }
+    public CheckDetails Check { get; set; }
+    public CreditNoteRefundDetails CreditNoteRefund { get; set; }
+}
+```
+
+---
+
+### `Models/BankTransferDetails.cs`
+
+```csharp
+public class BankTransferDetails
+{
+    public string BankAccountId { get; set; }           // Beneficiary account ID
+    public string PartyBankAccountId { get; set; }      // Party account ID
+    public string ContractReferenceNumber { get; set; } // Contract/reference number
+    public DateTime AccountingDate { get; set; }        // Value date
+}
+```
+
+---
+
+### `Models/CheckDetails.cs`
+
+```csharp
+public class CheckDetails
+{
+    public string CheckSequenceNumber { get; set; }  // Mandatory check number
+    public string BankId { get; set; }               // Bank ID
+    public DateTime CheckDeferredDate { get; set; }  // Deferred date (if any)
+    public decimal CheckAmount { get; set; }         // Check amount
+}
+```
+
+---
+
+### `Models/CreditNoteRefundDetails.cs`
+
+```csharp
+public class CreditNoteRefundDetails
+{
+    public string TransSerial { get; set; }         // Document series ID
+    public string TransDocument { get; set; }       // Document type ("Nota de Crédito-Reembolso")
+    public long TransDocNumber { get; set; }        // Document number
+    public decimal TotalAmount { get; set; }        // Total available amount
+    public decimal SpentValueAmount { get; set; }   // Amount to deduct/spend
+}
+```
+
+---
+
+### `Models/TenderOption.cs`
+
+```csharp
+public class TenderOption
+{
+    public string Id { get; set; }          // Option ID (account, bank, series code)
+    public string DisplayText { get; set; } // Display name for combo boxes
 }
 ```
 
@@ -144,11 +263,62 @@ public class TenderAllocation
 ```csharp
 public class TenderSplitResult
 {
-    public List<TenderAllocation> Allocations { get; set; }  // Only entries with Amount > 0
+    public List<TenderAllocation> Allocations { get; set; }  // Only entries with Amount > 0; includes captured details
     public decimal TotalAllocated { get; set; }
     public decimal ChangeDue { get; set; }                   // 0 when no overpayment
 }
 ```
+
+---
+
+### `Forms/BankTransferDialog.cs`
+
+Modal popup for capturing wire transfer details. Triggered when user selects a `tndBankWireTransfer` tender.
+
+**Layout:**
+- Header: "Transferência bancária"
+- Beneficiary account dropdown (from `TenderItem.BeneficiaryAccounts`)
+- Party account dropdown (from `TenderItem.PartyAccounts`)
+- Contract reference textbox
+- Value date picker
+- OK / Cancel buttons
+
+**Result:** Returns `BankTransferDetails` on OK, null on cancel.
+
+---
+
+### `Forms/CheckDialog.cs`
+
+Modal popup for capturing check details. Triggered when user selects a `tndCheck` tender.
+
+**Layout:**
+- Header: "Cheque"
+- Check number textbox (mandatory; yellow background when empty)
+- Bank dropdown (from `TenderItem.Banks`)
+- Deferred date picker
+- Amount field (numeric)
+- OK / Cancel buttons
+
+**Validation:** Check number is required; `OnOk()` returns null if empty.
+
+**Result:** Returns `CheckDetails` on OK, null on cancel.
+
+---
+
+### `Forms/CreditNoteRefundDialog.cs`
+
+Modal popup for capturing credit note / voucher details. Triggered when user selects a `tndVoucher` tender.
+
+**Layout:**
+- Header: "Dados do documento"
+- Series dropdown (from `TenderItem.Series`)
+- Document type textbox (read-only: "Nota de Crédito-Reembolso")
+- Document number numeric field
+- Available amount numeric field
+- Amount to deduct numeric field (pre-filled with tender allocation amount)
+- OK / Cancel buttons
+
+**Result:** Returns `CreditNoteRefundDetails` on OK, null on cancel.
 
 ---
 
@@ -167,10 +337,13 @@ MSTest 3.1.1 project targeting `net472`. Uses two helpers:
 
 | Test class | Tests | What is covered |
 |---|---|---|
-| `TenderItemTests` | 14 | Constructor validation (null/empty/whitespace id & name), property defaults, setters |
-| `TenderAllocationTests` | 5 | Property round-trips, reassignment |
+| `TenderItemTests` | 14 | Constructor validation (null/empty/whitespace name), TenderType enum, property defaults, setters |
+| `TenderAllocationTests` | 12 | Property round-trips (Amount, Tender), BankTransfer/Check/CreditNoteRefund detail properties |
 | `TenderSplitResultTests` | 5 | Multi-allocation list, ChangeDue = 0, TotalAllocated |
-| `TenderSplitDialogTests` | 32 | Constructor guards, `FormatCurrency`, `AmountToBuffer`, `HandleNumpad` (digit/backspace/dot), `CommitBuffer` (MaxAmount cap, AllowsChange cap), `NavigateTender` (boundary clamp), `SelectTender` (index/buffer sync), `UpdateSummary` (label text, button state), `Confirm` (exact/over/under pay, zero-alloc exclusion, multi-tender split), `Show` guards |
+| `TenderSplitDialogTests` | 33 | Constructor guards, `FormatCurrency`, `AmountToBuffer`, `HandleNumpad` (digit/backspace/dot), `CommitBuffer` (MaxAmount cap, AllowsChange cap), `NavigateTender` (boundary clamp), `SelectTender` (index/buffer sync), `UpdateSummary` (label text, button state), `Confirm` (exact/over/under pay, zero-alloc exclusion, multi-tender split, auto-fill on OK), `Show` guards, end-to-end multi-tender scenario |
+| `TenderDetailDialogsTests` | 7 | `RequiresPopup` logic, `FirstMissingDetailIndex`, details capture and return in allocations, popup dialogs (BankTransferDialog, CheckDialog, CreditNoteRefundDialog), mandatory field validation |
+
+**Total: 83 tests, all passing.**
 
 ---
 
@@ -211,9 +384,21 @@ using SmartTenderWindowTenderSplit.Models;
 
 var tenders = new List<TenderItem>
 {
-    new TenderItem("CASH", "Numerário")   { AllowsChange = true,  PreloadedAmount = 50m },
-    new TenderItem("CARD", "Cartão")      { AllowsChange = false, MaxAmount = 500m },
-    new TenderItem("CHECK", "Cheque")     { AllowsChange = false },
+    new TenderItem(TenderTypeEnum.tndCash, "Numerário") 
+    { 
+        AllowsChange = true, 
+        PreloadedAmount = 50m 
+    },
+    new TenderItem(TenderTypeEnum.tndCreditDebitCard, "Cartão") 
+    { 
+        AllowsChange = false, 
+        MaxAmount = 500m 
+    },
+    new TenderItem(TenderTypeEnum.tndCheck, "Cheque") 
+    { 
+        AllowsChange = false,
+        Banks = new List<TenderOption> { new TenderOption("BCP", "Banco BCP") }
+    },
 };
 
 TenderSplitResult result = TenderSplitDialog.Show(
@@ -237,6 +422,10 @@ if (result != null)
 - `TotalAllocated` must be ≥ `documentTotal` to enable confirm.
 - For tenders where `AllowsChange = false`, the entered amount is capped at `documentTotal`.
 - If a `TenderItem.MaxAmount` is set, the input is capped at that value (takes priority over the AllowsChange cap).
+- For tenders of type `tndBankWireTransfer`, `tndCheck`, or `tndVoucher`: the corresponding detail popup must be completed before confirmation is allowed.
+- When OK is clicked with no amount entered, the selected tender is auto-filled with the full document total.
+- Delete key in grid cells deletes selected text (via `ProcessCmdKey` override).
+- Grid TabStop=false prevents focus stealing; OK button remains focused for keyboard input.
 
 ---
 
@@ -253,8 +442,8 @@ if (result != null)
 
 | Namespace | Contents |
 |---|---|
-| `SmartTenderWindowTenderSplit.Forms` | `TenderSplitDialog` |
-| `SmartTenderWindowTenderSplit.Models` | `TenderItem`, `TenderAllocation`, `TenderSplitResult` |
+| `SmartTenderWindowTenderSplit.Forms` | `TenderSplitDialog`, `BankTransferDialog`, `CheckDialog`, `CreditNoteRefundDialog` |
+| `SmartTenderWindowTenderSplit.Models` | `TenderTypeEnum`, `TenderItem`, `TenderAllocation`, `TenderSplitResult`, `BankTransferDetails`, `CheckDetails`, `CreditNoteRefundDetails`, `TenderOption` |
 | `SmartTenderWindow.Tests.Helpers` | `StaHelper`, `ReflectionHelper` |
-| `SmartTenderWindow.Tests.Models` | Model test classes |
-| `SmartTenderWindow.Tests.Forms` | Dialog test classes |
+| `SmartTenderWindow.Tests.Models` | `TenderItemTests`, `TenderAllocationTests`, `TenderSplitResultTests` |
+| `SmartTenderWindow.Tests.Forms` | `TenderSplitDialogTests`, `TenderDetailDialogsTests` |
