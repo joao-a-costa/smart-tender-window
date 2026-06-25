@@ -205,7 +205,7 @@ namespace SmartTenderWindowTenderSplit.Forms
                     break;
                 case Keys.Up: NavigateTender(-1); e.Handled = true; break;  
                 case Keys.Down: NavigateTender(1); e.Handled = true; break;
-                case Keys.Tab: FinalizeInputAndOpenDetailsIfNeeded(); e.Handled = true; break;
+                //case Keys.Tab: FinalizeInputAndOpenDetailsIfNeeded(); e.Handled = true; break;
                 //case Keys.Enter: FinalizeInputAndOpenDetailsIfNeeded(); if (FirstMissingDetailIndex() < 0) Confirm(); e.Handled = true; break;
                 case Keys.Escape: btnCancel_Click(sender, e); e.Handled = true; break;
             }
@@ -264,6 +264,11 @@ namespace SmartTenderWindowTenderSplit.Forms
         {
             int next = Math.Max(0, Math.Min(_tenders.Count - 1, _selectedIndex + delta));
             SelectTender(next);
+            // Scroll to keep the selected row visible when navigating with arrows
+            if (next >= 0 && next < dgvTenders.Rows.Count)
+            {
+                dgvTenders.FirstDisplayedScrollingRowIndex = next;
+            }
         }
 
         // ── Numpad input ─────────────────────────────────────────────────────
@@ -420,7 +425,7 @@ namespace SmartTenderWindowTenderSplit.Forms
                 lblMissingValue.ForeColor   = ClrError;
             }
 
-            fulfilled = delivered == 0 || _documentTotal == delivered;
+            fulfilled = delivered == 0 || _documentTotal == delivered || delivered > _documentTotal;
 
             btnConfirm.Enabled   = fulfilled;
             btnConfirm.BackColor = fulfilled ? ClrHeader : ClrDisabled;
@@ -430,7 +435,9 @@ namespace SmartTenderWindowTenderSplit.Forms
 
         private void Confirm()
         {
-            if (_amounts.Sum() < _documentTotal) return;
+            var amountsSum = _amounts.Sum();
+
+            if (amountsSum != 0 && _amounts.Sum() < _documentTotal) return;
 
             // Block confirmation while a tender that requires extra data is missing it.
             int missing = FirstMissingDetailIndex();
@@ -443,7 +450,10 @@ namespace SmartTenderWindowTenderSplit.Forms
                 return;
             }
 
-            decimal total  = _amounts.Sum();
+            // If nothing delivered yet and a tender is selected, fill it with the full document total
+            FillTenderWithDocumentTotal();
+
+            decimal total = _amounts.Sum();
             decimal change = total > _documentTotal ? total - _documentTotal : 0m;
 
             Result = new TenderSplitResult
@@ -451,20 +461,30 @@ namespace SmartTenderWindowTenderSplit.Forms
                 Allocations = _tenders
                     .Select((t, i) => new TenderAllocation
                     {
-                        Tender           = t,
-                        Amount           = _amounts[i],
-                        BankTransfer     = _details[i] as BankTransferDetails,
-                        Check            = _details[i] as CheckDetails,
+                        Tender = t,
+                        Amount = _amounts[i],
+                        BankTransfer = _details[i] as BankTransferDetails,
+                        Check = _details[i] as CheckDetails,
                         CreditNoteRefund = _details[i] as CreditNoteRefundDetails
                     })
                     .Where(a => a.Amount > 0)
                     .ToList(),
                 TotalAllocated = total,
-                ChangeDue      = change
+                ChangeDue = change
             };
 
             DialogResult = DialogResult.OK;
             Close();
+        }
+
+        private void FillTenderWithDocumentTotal()
+        {
+            decimal totalDelivered = _amounts.Sum();
+            if (totalDelivered == 0 && _selectedIndex >= 0)
+            {
+                SetAmount(_selectedIndex, _documentTotal);
+                UpdateSummary();
+            }
         }
 
         // ── Event handlers ────────────────────────────────────────────────────
@@ -485,12 +505,7 @@ namespace SmartTenderWindowTenderSplit.Forms
             dgvTenders.EndEdit();
 
             // If nothing delivered yet and a tender is selected, fill it with the full document total
-            decimal totalDelivered = _amounts.Sum();
-            if (totalDelivered == 0 && _selectedIndex >= 0)
-            {
-                SetAmount(_selectedIndex, _documentTotal);
-                UpdateSummary();
-            }
+            FillTenderWithDocumentTotal();
 
             FinalizeInputAndOpenDetailsIfNeeded();
             if (FirstMissingDetailIndex() < 0) Confirm();
@@ -540,7 +555,7 @@ namespace SmartTenderWindowTenderSplit.Forms
                 case Keys.Delete:  HandleNumpad("⌫");   break;
                 case Keys.Up:      NavigateTender(-1);  break;
                 case Keys.Down:    NavigateTender(1);   break;
-                case Keys.Tab:     FinalizeInputAndOpenDetailsIfNeeded(); break;
+                //case Keys.Tab:     FinalizeInputAndOpenDetailsIfNeeded(); break;
                 case Keys.Enter:
                     FinalizeInputAndOpenDetailsIfNeeded();
                     if (FirstMissingDetailIndex() < 0) Confirm();
