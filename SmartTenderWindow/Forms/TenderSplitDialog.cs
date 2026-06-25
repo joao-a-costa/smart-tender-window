@@ -203,9 +203,9 @@ namespace SmartTenderWindowTenderSplit.Forms
                         e.Handled = true;
                     }
                     break;
-                case Keys.Up: NavigateTender(-1); e.Handled = true; break;
+                case Keys.Up: NavigateTender(-1); e.Handled = true; break;  
                 case Keys.Down: NavigateTender(1); e.Handled = true; break;
-                //case Keys.Tab: FinalizeInputAndOpenDetailsIfNeeded(); e.Handled = true; break;
+                case Keys.Tab: FinalizeInputAndOpenDetailsIfNeeded(); e.Handled = true; break;
                 //case Keys.Enter: FinalizeInputAndOpenDetailsIfNeeded(); if (FirstMissingDetailIndex() < 0) Confirm(); e.Handled = true; break;
                 case Keys.Escape: btnCancel_Click(sender, e); e.Handled = true; break;
             }
@@ -256,9 +256,6 @@ namespace SmartTenderWindowTenderSplit.Forms
 
             if (btnDetails != null)
                 btnDetails.Visible = RequiresPopup(_tenders[index].TenderType);
-
-            // Ensure the form has focus so keyboard input works
-            this.Focus();
 
             UpdateSummary();
         }
