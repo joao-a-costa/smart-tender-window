@@ -20,6 +20,7 @@ namespace SmartTenderWindow.Windows
             this.lblDocumentTotal = new System.Windows.Forms.Label();
             this.nudDocumentTotal = new System.Windows.Forms.NumericUpDown();
             this.btnOpenTender = new System.Windows.Forms.Button();
+            this.button1 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.nudTenderCount)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudDocumentTotal)).BeginInit();
             this.SuspendLayout();
@@ -36,13 +37,8 @@ namespace SmartTenderWindow.Windows
             // nudTenderCount
             // 
             this.nudTenderCount.Location = new System.Drawing.Point(200, 26);
-            this.nudTenderCount.Maximum = new decimal(new int[] {
-            100,
-            0,
-            0,
-            0});
             this.nudTenderCount.Minimum = new decimal(new int[] {
-            1,
+            10,
             0,
             0,
             0});
@@ -50,7 +46,7 @@ namespace SmartTenderWindow.Windows
             this.nudTenderCount.Size = new System.Drawing.Size(157, 22);
             this.nudTenderCount.TabIndex = 0;
             this.nudTenderCount.Value = new decimal(new int[] {
-            3,
+            10,
             0,
             0,
             0});
@@ -89,19 +85,30 @@ namespace SmartTenderWindow.Windows
             // 
             // btnOpenTender
             // 
-            this.btnOpenTender.Location = new System.Drawing.Point(24, 110);
+            this.btnOpenTender.Location = new System.Drawing.Point(27, 110);
             this.btnOpenTender.Name = "btnOpenTender";
-            this.btnOpenTender.Size = new System.Drawing.Size(333, 30);
+            this.btnOpenTender.Size = new System.Drawing.Size(330, 30);
             this.btnOpenTender.TabIndex = 2;
             this.btnOpenTender.Text = "Open Tender Window";
             this.btnOpenTender.UseVisualStyleBackColor = true;
             this.btnOpenTender.Click += new System.EventHandler(this.btnOpenTender_Click);
             // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(27, 146);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(330, 30);
+            this.button1.TabIndex = 3;
+            this.button1.Text = "Open Test Window";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(378, 163);
+            this.ClientSize = new System.Drawing.Size(378, 234);
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.lblTenderCount);
             this.Controls.Add(this.nudTenderCount);
             this.Controls.Add(this.lblDocumentTotal);
@@ -127,5 +134,6 @@ namespace SmartTenderWindow.Windows
         private System.Windows.Forms.Label lblDocumentTotal;
         private System.Windows.Forms.NumericUpDown nudDocumentTotal;
         private System.Windows.Forms.Button btnOpenTender;
+        private System.Windows.Forms.Button button1;
     }
 }

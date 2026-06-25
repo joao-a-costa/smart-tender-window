@@ -205,8 +205,8 @@ namespace SmartTenderWindowTenderSplit.Forms
                     break;
                 case Keys.Up: NavigateTender(-1); e.Handled = true; break;
                 case Keys.Down: NavigateTender(1); e.Handled = true; break;
-                case Keys.Tab: FinalizeInputAndOpenDetailsIfNeeded(); e.Handled = true; break;
-                case Keys.Enter: FinalizeInputAndOpenDetailsIfNeeded(); if (FirstMissingDetailIndex() < 0) Confirm(); e.Handled = true; break;
+                //case Keys.Tab: FinalizeInputAndOpenDetailsIfNeeded(); e.Handled = true; break;
+                //case Keys.Enter: FinalizeInputAndOpenDetailsIfNeeded(); if (FirstMissingDetailIndex() < 0) Confirm(); e.Handled = true; break;
                 case Keys.Escape: btnCancel_Click(sender, e); e.Handled = true; break;
             }
         }
@@ -423,6 +423,8 @@ namespace SmartTenderWindowTenderSplit.Forms
                 lblMissingValue.ForeColor   = ClrError;
             }
 
+            fulfilled = delivered == 0 || _documentTotal == delivered;
+
             btnConfirm.Enabled   = fulfilled;
             btnConfirm.BackColor = fulfilled ? ClrHeader : ClrDisabled;
         }
@@ -484,6 +486,14 @@ namespace SmartTenderWindowTenderSplit.Forms
         {
             // End grid editing to commit any pending cell edits before finalizing
             dgvTenders.EndEdit();
+
+            // If nothing delivered yet and a tender is selected, fill it with the full document total
+            decimal totalDelivered = _amounts.Sum();
+            if (totalDelivered == 0 && _selectedIndex >= 0)
+            {
+                SetAmount(_selectedIndex, _documentTotal);
+                UpdateSummary();
+            }
 
             FinalizeInputAndOpenDetailsIfNeeded();
             if (FirstMissingDetailIndex() < 0) Confirm();

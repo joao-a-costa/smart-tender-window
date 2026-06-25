@@ -755,5 +755,46 @@ namespace SmartTenderWindow.Tests.Forms
                     TenderSplitDialog.Show(null, new List<TenderItem>(), 10m));
             });
         }
+
+        // ── End-to-end: Cash and card (no details required) ──────────────────
+
+        [TestMethod]
+        public void Confirm_CashAndCard_NoDetailsRequired()
+        {
+            StaHelper.Run(() =>
+            {
+                var tenders = new List<TenderItem>
+                {
+                    new TenderItem(TenderTypeEnum.tndCash, "Numerário")      { AllowsChange = true },
+                    new TenderItem(TenderTypeEnum.tndCreditDebitCard, "Cartão") { AllowsChange = false }
+                };
+
+                using (var dlg = new TenderSplitDialog(tenders, 50m))
+                {
+                    // Cash: 30.00
+                    ReflectionHelper.InvokePrivate(dlg, "SelectTender", 0);
+                    ReflectionHelper.InvokePrivate(dlg, "HandleNumpad", "3");
+                    ReflectionHelper.InvokePrivate(dlg, "HandleNumpad", "0");
+                    ReflectionHelper.InvokePrivate(dlg, "HandleNumpad", "0");
+                    ReflectionHelper.InvokePrivate(dlg, "HandleNumpad", "0");
+
+                    // Card: 20.00
+                    ReflectionHelper.InvokePrivate(dlg, "SelectTender", 1);
+                    ReflectionHelper.InvokePrivate(dlg, "HandleNumpad", "2");
+                    ReflectionHelper.InvokePrivate(dlg, "HandleNumpad", "0");
+                    ReflectionHelper.InvokePrivate(dlg, "HandleNumpad", "0");
+                    ReflectionHelper.InvokePrivate(dlg, "HandleNumpad", "0");
+
+                    ReflectionHelper.InvokePrivate(dlg, "Confirm");
+
+                    Assert.IsNotNull(dlg.Result);
+                    Assert.AreEqual(2, dlg.Result.Allocations.Count);
+                    Assert.AreEqual(50m, dlg.Result.TotalAllocated);
+                    Assert.IsNull(dlg.Result.Allocations[0].BankTransfer);
+                    Assert.IsNull(dlg.Result.Allocations[0].Check);
+                    Assert.IsNull(dlg.Result.Allocations[0].CreditNoteRefund);
+                }
+            });
+        }
     }
 }

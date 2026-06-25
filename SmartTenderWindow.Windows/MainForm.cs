@@ -27,7 +27,7 @@ namespace SmartTenderWindow.Windows
         public MainForm()
         {
             InitializeComponent();
-            nudTenderCount.Value = Rng.Next(1, 11);
+            nudTenderCount.Value = Rng.Next(10, 99);
             nudDocumentTotal.Value = Math.Round((decimal)(Rng.NextDouble() * 499.99 + 0.01), 2);
         }
 
@@ -83,6 +83,14 @@ namespace SmartTenderWindow.Windows
             for (int i = 0; i < labels.Length; i++)
                 list.Add(new TenderOption((i + 1).ToString(), labels[i]));
             return list;
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            using (var form = new Form1())
+            {
+                form.ShowDialog(this);
+            }
         }
     }
 }
