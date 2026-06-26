@@ -21,10 +21,17 @@ namespace SmartTenderWindowTenderSplit.Forms
         // Per-tender extra details captured via popups. Holds a BankTransferDetails,
         // CheckDetails or CreditNoteRefundDetails, or null when none / not applicable.
         private readonly object[] _details;
+        private readonly bool[]   _optionsLoaded;  // Tracks whether TenderOptionsNeeded has fired for each tender
 
         private bool _updatingGrid = false;  // Flag to prevent recursive updates when programmatically changing grid cells
 
         public TenderSplitResult Result { get; private set; }
+
+        /// <summary>
+        /// Fired once per tender that requires a popup, just before that popup opens.
+        /// Set the relevant list properties on the event args to provide dropdown options.
+        /// </summary>
+        public event EventHandler<TenderOptionsNeededEventArgs> TenderOptionsNeeded;
 
         // ── Constructor ──────────────────────────────────────────────────────
 
@@ -40,9 +47,10 @@ namespace SmartTenderWindowTenderSplit.Forms
 
             _documentTotal = documentTotal;
             _confirmHotkey = confirmHotkey;
-            _colorScheme = colorScheme ?? new TenderDialogColorScheme();
+            _colorScheme   = colorScheme ?? new TenderDialogColorScheme();
             _amounts       = new decimal[_tenders.Count];
             _details       = new object[_tenders.Count];
+            _optionsLoaded = new bool[_tenders.Count];
             for (int i = 0; i < _tenders.Count; i++)
                 _amounts[i] = _tenders[i].PreloadedAmount;
 
@@ -363,6 +371,8 @@ namespace SmartTenderWindowTenderSplit.Forms
             int i = _selectedIndex;
             var tender = _tenders[i];
 
+            EnsureOptionsLoaded(i, tender);
+
             switch (tender.TenderType)
             {
                 case TenderTypeEnum.tndBankWireTransfer:
@@ -389,6 +399,23 @@ namespace SmartTenderWindowTenderSplit.Forms
             }
 
             UpdateSummary();
+        }
+
+        private void EnsureOptionsLoaded(int index, TenderItem tender)
+        {
+            if (_optionsLoaded[index]) return;
+            _optionsLoaded[index] = true;
+
+            var handler = TenderOptionsNeeded;
+            if (handler == null) return;
+
+            var args = new TenderOptionsNeededEventArgs(tender, index);
+            handler(this, args);
+
+            if (args.BeneficiaryAccounts != null) tender.BeneficiaryAccounts = args.BeneficiaryAccounts;
+            if (args.PartyAccounts       != null) tender.PartyAccounts       = args.PartyAccounts;
+            if (args.Banks               != null) tender.Banks               = args.Banks;
+            if (args.Series              != null) tender.Series              = args.Series;
         }
 
         /// <summary>Cancelling a popup clears the line: amount reset to zero and details dropped.</summary>

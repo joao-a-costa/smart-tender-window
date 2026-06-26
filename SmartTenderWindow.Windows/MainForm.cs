@@ -58,15 +58,17 @@ namespace SmartTenderWindow.Windows
 
                 tenders.Add(new TenderItem(type, name)
                 {
-                    AllowsChange = (i == 0),
-                    BeneficiaryAccounts = SampleOptions("Banco Comercial Português", "Caixa Geral de Depósitos"),
-                    PartyAccounts = SampleOptions("Conta Cliente A", "Conta Cliente B"),
-                    Banks = SampleOptions("Millennium BCP", "CGD", "Novo Banco"),
-                    Series = SampleOptions("1", "2")
+                    AllowsChange = (i == 0)
                 });
             }
 
-            TenderSplitResult result = TenderSplitDialog.Show(this, tenders, total, "Pagamento");
+            TenderSplitResult result;
+            using (var dialog = new TenderSplitDialog(tenders, total))
+            {
+                dialog.Text = "Pagamento";
+                dialog.TenderOptionsNeeded += OnTenderOptionsNeeded;
+                result = dialog.ShowDialog(this) == System.Windows.Forms.DialogResult.OK ? dialog.Result : null;
+            }
 
             if (result != null)
             {
@@ -109,6 +111,23 @@ namespace SmartTenderWindow.Windows
             else
             {
                 txtJsonResult.Text = "";
+            }
+        }
+
+        private void OnTenderOptionsNeeded(object sender, TenderOptionsNeededEventArgs e)
+        {
+            switch (e.TenderType)
+            {
+                case TenderTypeEnum.tndBankWireTransfer:
+                    e.BeneficiaryAccounts = SampleOptions("Banco Comercial Português", "Caixa Geral de Depósitos");
+                    e.PartyAccounts       = SampleOptions("Conta Cliente A", "Conta Cliente B");
+                    break;
+                case TenderTypeEnum.tndCheck:
+                    e.Banks = SampleOptions("Millennium BCP", "CGD", "Novo Banco");
+                    break;
+                case TenderTypeEnum.tndVoucher:
+                    e.Series = SampleOptions("1", "2");
+                    break;
             }
         }
 

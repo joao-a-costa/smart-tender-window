@@ -33,10 +33,12 @@ smart-tender-window/
 │   │   ├── CheckDetails.cs                   # Check details (number, bank, date, amount)
 │   │   ├── CreditNoteRefundDetails.cs        # Credit note details (serial, doc#, amounts)
 │   │   ├── TenderOption.cs                   # Dropdown option (Id + display text)
+│   │   ├── TenderDialogColorScheme.cs        # Customizable color theme
+│   │   ├── TenderOptionsNeededEventArgs.cs   # Event args for lazy-loading dropdown options
 │   │   └── SmartTenderWindow.csproj          # .NET Framework 4.7.2, old-style csproj
 │
 ├── SmartTenderWindow.Windows/                # WinForms test harness (WinExe)
-│   ├── MainForm.cs                           # UI to pick tender count & document total
+│   ├── MainForm.cs                           # UI to pick tender count & document total; wires TenderOptionsNeeded event
 │   ├── MainForm.Designer.cs
 │   ├── Program.cs
 │   └── SmartTenderWindow.Windows.csproj
@@ -70,13 +72,17 @@ The core Windows Form. POS cash-register style: full-screen maximized dialog wit
 #### Constructor
 
 ```csharp
-TenderSplitDialog(IEnumerable<TenderItem> tenders, decimal documentTotal)
+TenderSplitDialog(IEnumerable<TenderItem> tenders, decimal documentTotal, 
+                  Keys confirmHotkey = Keys.F10, 
+                  TenderDialogColorScheme colorScheme = null)
 ```
 
 - Throws `ArgumentNullException` when `tenders` is null.
 - Throws `ArgumentException` when `tenders` is empty.
 - Throws `ArgumentOutOfRangeException` when `documentTotal` ≤ 0.
 - Preloads `_amounts[]` from each `TenderItem.PreloadedAmount`.
+- `confirmHotkey`: keyboard key to trigger confirm (default F10). Can be any `Keys` enum value.
+- `colorScheme`: optional `TenderDialogColorScheme` for custom colors. Defaults to built-in green theme if null.
 - Calls `BuildTenderGrid()` then `SelectTender(0)`.
 - First tender auto-selected on open for convenience.
 
@@ -84,10 +90,15 @@ TenderSplitDialog(IEnumerable<TenderItem> tenders, decimal documentTotal)
 
 ```csharp
 TenderSplitResult Show(IWin32Window owner, IEnumerable<TenderItem> tenders,
-                       decimal documentTotal, string title = null)
+                       decimal documentTotal, string title = null,
+                       Keys confirmHotkey = Keys.F10,
+                       TenderDialogColorScheme colorScheme = null)
 ```
 
 Shows the dialog modally. Returns a `TenderSplitResult` on confirmation, or `null` on cancel.
+- `title`: optional window title (default "Tender Split").
+- `confirmHotkey`: keyboard shortcut to confirm (default F10). Can be parameterized to any key.
+- `colorScheme`: optional custom color theme. If null, uses default green theme.
 
 #### Key private methods
 
@@ -96,13 +107,14 @@ Shows the dialog modally. Returns a `TenderSplitResult` on confirmation, or `nul
 | `BuildTenderGrid()` | Dynamically creates a DataGridView with two columns (Tender Name, Amount). Applies styling: green header, alternating row colors (white/light gray). Sets `TabStop=false` so grid doesn't steal focus. Wires up cell editing, selection, and keyboard handlers. |
 | `SelectTender(int index)` | Highlights the selected row in grid, syncs `_inputBuffer` to the current amount. Shows Details button if tender type requires popup. No-op when index equals `_selectedIndex`. |
 | `NavigateTender(int delta)` | Moves selection by `delta`, clamped to `[0, count-1]`. Scrolls grid to keep selected row visible. |
-| `HandleNumpad(string key)` | Cash-register input: digits append right, `"⌫"` removes last digit (floors to `"0"`), `"."` is a no-op (2 decimal places are implied). Calls `CommitBuffer()`. |
+| `HandleNumpad(string key)` | Cash-register input: digits append right, `"⌫"` removes last digit (floors to `"0"`), `"."` and `","` are no-ops (2 decimal places are implied). Calls `CommitBuffer()`. Auto-enters cell edit mode on first numeric key press. |
 | `CommitBuffer()` | Parses `_inputBuffer` as `raw / 100m`. Enforces `MaxAmount` cap, then enforces `documentTotal` cap for `AllowsChange = false` tenders. |
 | `UpdateSummary()` | Recalculates delivered / missing. Shows **"Em falta:"** (red) when underpaid, **"Troco:"** (green) when overpaid or exact. Enables/disables `btnConfirm`. |
 | `Confirm()` | Guards against underpayment and missing details. Builds `TenderSplitResult` with allocations (only Amount > 0) carrying captured details, sets `DialogResult = OK`. |
 | `FinalizeInputAndOpenDetailsIfNeeded()` | Commits current amount and auto-opens popup dialog for tenders requiring details (wire, check, voucher). |
 | `FirstMissingDetailIndex()` | Returns index of first tender with Amount > 0 but missing required details, or -1 if all complete. |
 | `RequiresPopup(TenderTypeEnum?)` | Returns true for `tndBankWireTransfer`, `tndCheck`, `tndVoucher`; false otherwise. |
+| `EnsureOptionsLoaded(int, TenderItem)` | Fires `TenderOptionsNeeded` event once per tender (guarded by `_optionsLoaded[]` cache). Writes returned lists back onto the `TenderItem`. No-op on subsequent calls for the same index. |
 | `FormatCurrency(decimal)` | Returns `value.ToString("N2") + " €"`. |
 | `AmountToBuffer(decimal)` | Returns `((long)(value * 100)).ToString()`, or `"0"` for zero. |
 
@@ -174,7 +186,7 @@ public class TenderItem
     public decimal? MaxAmount { get; set; }         // Optional hard cap (default null)
     public bool AllowsChange { get; set; }          // true = overpayment → change; false = capped at total
     
-    // For special tender types requiring popup details
+    // Populated lazily via TenderOptionsNeeded event (do NOT pre-fill; dialog sets these from event args)
     public List<TenderOption> BeneficiaryAccounts { get; set; }  // For wire transfers
     public List<TenderOption> PartyAccounts { get; set; }        // For wire transfers
     public List<TenderOption> Banks { get; set; }                // For checks
@@ -254,6 +266,71 @@ public class TenderOption
     public string Id { get; set; }          // Option ID (account, bank, series code)
     public string DisplayText { get; set; } // Display name for combo boxes
 }
+```
+
+---
+
+### `Models/TenderDialogColorScheme.cs`
+
+Customizable color theme for the tender dialog. All colors are configurable; defaults to green POS theme.
+
+```csharp
+public class TenderDialogColorScheme
+{
+    public Color HeaderBackColor { get; set; }      // Header bar background (default: green #4CAF50)
+    public Color HeaderTextColor { get; set; }      // Header text (default: white)
+    public Color SelectedRowColor { get; set; }     // Selected tender row (default: light green #C8E6C9)
+    public Color AlternatingRowColor { get; set; }  // Even rows (default: light gray #F0F0F0)
+    public Color DefaultRowColor { get; set; }      // Odd rows (default: white)
+    public Color ErrorColor { get; set; }           // Error accent (default: red #D32F2F)
+    public Color DisabledColor { get; set; }        // Disabled button (default: gray #B4B4B4)
+    public Color SuccessColor { get; set; }         // Success accent (default: green #4CAF50)
+    public Color HeaderForeColor { get; set; }      // Header foreground (default: white)
+    public Color ErrorTextColor { get; set; }       // "Em falta" error text (default: red #D32F2F)
+    public Color SuccessTextColor { get; set; }     // "Troco" success text (default: green #4CAF50)
+}
+```
+
+Pass to `TenderSplitDialog.Show()` via the `colorScheme` parameter to customize appearance.
+
+---
+
+### `Models/TenderOptionsNeededEventArgs.cs`
+
+Event args for the `TenderOptionsNeeded` event. Fired once per tender that requires a popup, just before that popup opens. The caller sets whichever list properties are relevant for the `TenderType`; the dialog writes them back onto the `TenderItem` and caches that the load has happened.
+
+```csharp
+public class TenderOptionsNeededEventArgs : EventArgs
+{
+    public TenderItem Tender { get; }          // The tender that needs options
+    public TenderTypeEnum? TenderType { get; } // Shortcut for switching
+    public int TenderIndex { get; }            // Index in the tenders list
+
+    // Set whichever are relevant for the TenderType:
+    public List<TenderOption> BeneficiaryAccounts { get; set; }  // tndBankWireTransfer
+    public List<TenderOption> PartyAccounts { get; set; }        // tndBankWireTransfer
+    public List<TenderOption> Banks { get; set; }                // tndCheck
+    public List<TenderOption> Series { get; set; }               // tndVoucher
+}
+```
+
+**Pattern:** wire the event before showing the dialog; switch on `TenderType` to set only what's needed.
+
+```csharp
+dialog.TenderOptionsNeeded += (s, e) => {
+    switch (e.TenderType) {
+        case TenderTypeEnum.tndBankWireTransfer:
+            e.BeneficiaryAccounts = LoadBeneficiaryAccounts();
+            e.PartyAccounts       = LoadPartyAccounts();
+            break;
+        case TenderTypeEnum.tndCheck:
+            e.Banks = LoadBanks();
+            break;
+        case TenderTypeEnum.tndVoucher:
+            e.Series = LoadSeries();
+            break;
+    }
+};
 ```
 
 ---
@@ -396,16 +473,50 @@ var tenders = new List<TenderItem>
     },
     new TenderItem(TenderTypeEnum.tndCheck, "Cheque") 
     { 
-        AllowsChange = false,
-        Banks = new List<TenderOption> { new TenderOption("BCP", "Banco BCP") }
+        AllowsChange = false
+        // Do NOT pre-fill Banks — supply them via TenderOptionsNeeded event
     },
+};
+
+// Recommended: instantiate directly to wire TenderOptionsNeeded before showing
+using (var dialog = new TenderSplitDialog(tenders, 37.50m))
+{
+    dialog.Text = "Pagamento";
+    dialog.TenderOptionsNeeded += (s, e) =>
+    {
+        switch (e.TenderType)
+        {
+            case TenderTypeEnum.tndBankWireTransfer:
+                e.BeneficiaryAccounts = LoadBeneficiaryAccounts();
+                e.PartyAccounts       = LoadPartyAccounts();
+                break;
+            case TenderTypeEnum.tndCheck:
+                e.Banks = LoadBanks();
+                break;
+            case TenderTypeEnum.tndVoucher:
+                e.Series = LoadSeries();
+                break;
+        }
+    };
+    TenderSplitResult result = dialog.ShowDialog(owner) == DialogResult.OK ? dialog.Result : null;
+}
+
+// With custom confirm hotkey and color scheme (using static Show — no event support)
+var customColors = new TenderDialogColorScheme
+{
+    HeaderBackColor = Color.DarkBlue,
+    SelectedRowColor = Color.LightBlue,
+    ErrorTextColor = Color.Red,
+    SuccessTextColor = Color.Green
 };
 
 TenderSplitResult result = TenderSplitDialog.Show(
     owner: this,
     tenders: tenders,
     documentTotal: 37.50m,
-    title: "Pagamento"
+    title: "Pagamento",
+    confirmHotkey: Keys.F10,
+    colorScheme: customColors
 );
 
 if (result != null)
@@ -415,6 +526,16 @@ if (result != null)
     Console.WriteLine($"Troco: {result.ChangeDue:N2} €");
 }
 ```
+
+### Keyboard & UI Features
+
+- **Grid Edit Mode**: Select a row and start typing numbers → automatically enters edit mode on the Amount cell. Period (`.`) and comma (`,`) are no-ops; both are treated as decimal separators and ignored (system enforces 2 decimal places internally).
+- **Confirm Hotkey**: Default is **F10**, but any `Keys` enum value can be set via `confirmHotkey` parameter.
+- **Cell Editing**: When in edit mode, TextBox handles input normally. `CellValueChanged` parses the value (accepts both `.` and `,` as decimal separators).
+- **Arrow Keys**: ↑/↓ navigate between tenders; selection scrolls to keep current row visible.
+- **Backspace/Delete**: Remove last digit in buffer (outside edit mode); behave normally in edit mode.
+- **Escape**: Cancel dialog.
+- **Enter**: Confirm if all validations pass.
 
 ### Validation rules enforced automatically
 
@@ -443,7 +564,7 @@ if (result != null)
 | Namespace | Contents |
 |---|---|
 | `SmartTenderWindowTenderSplit.Forms` | `TenderSplitDialog`, `BankTransferDialog`, `CheckDialog`, `CreditNoteRefundDialog` |
-| `SmartTenderWindowTenderSplit.Models` | `TenderTypeEnum`, `TenderItem`, `TenderAllocation`, `TenderSplitResult`, `BankTransferDetails`, `CheckDetails`, `CreditNoteRefundDetails`, `TenderOption` |
+| `SmartTenderWindowTenderSplit.Models` | `TenderTypeEnum`, `TenderItem`, `TenderAllocation`, `TenderSplitResult`, `BankTransferDetails`, `CheckDetails`, `CreditNoteRefundDetails`, `TenderOption`, `TenderDialogColorScheme`, `TenderOptionsNeededEventArgs` |
 | `SmartTenderWindow.Tests.Helpers` | `StaHelper`, `ReflectionHelper` |
 | `SmartTenderWindow.Tests.Models` | `TenderItemTests`, `TenderAllocationTests`, `TenderSplitResultTests` |
 | `SmartTenderWindow.Tests.Forms` | `TenderSplitDialogTests`, `TenderDetailDialogsTests` |
