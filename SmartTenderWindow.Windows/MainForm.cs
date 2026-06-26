@@ -70,8 +70,41 @@ namespace SmartTenderWindow.Windows
 
             if (result != null)
             {
+                var summary = new System.Text.StringBuilder();
+                summary.AppendLine("═══════════════════════════════════════════════════");
+                summary.AppendLine("TENDER SPLIT SUMMARY");
+                summary.AppendLine("═══════════════════════════════════════════════════");
+                summary.AppendLine();
+                summary.AppendLine($"Document Total:        €{total:N2}");
+                summary.AppendLine($"Total Allocated:       €{result.TotalAllocated:N2}");
+                summary.AppendLine($"Change Due:            €{result.ChangeDue:N2}");
+                summary.AppendLine();
+                summary.AppendLine("─────────────────────────────────────────────────");
+                summary.AppendLine("ALLOCATIONS:");
+                summary.AppendLine("─────────────────────────────────────────────────");
+
+                foreach (var alloc in result.Allocations)
+                {
+                    summary.AppendLine($"  {alloc.Tender.Name,-30} €{alloc.Amount:N2}");
+
+                    if (alloc.BankTransfer != null)
+                        summary.AppendLine($"    └─ Bank Transfer: {alloc.BankTransfer.ContractReferenceNumber}");
+                    else if (alloc.Check != null)
+                        summary.AppendLine($"    └─ Check #: {alloc.Check.CheckSequenceNumber}");
+                    else if (alloc.CreditNoteRefund != null)
+                        summary.AppendLine($"    └─ Credit Note: {alloc.CreditNoteRefund.TransDocument} #{alloc.CreditNoteRefund.TransDocNumber}");
+                }
+
+                summary.AppendLine();
+                summary.AppendLine("═══════════════════════════════════════════════════");
+                summary.AppendLine("JSON DATA:");
+                summary.AppendLine("═══════════════════════════════════════════════════");
+                summary.AppendLine();
+
                 string json = JsonConvert.SerializeObject(result, Formatting.Indented);
-                txtJsonResult.Text = json;
+                summary.Append(json);
+
+                txtJsonResult.Text = summary.ToString();
             }
             else
             {

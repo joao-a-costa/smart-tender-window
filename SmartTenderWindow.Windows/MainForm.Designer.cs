@@ -37,6 +37,8 @@ namespace SmartTenderWindow.Windows
             // 
             // nudTenderCount
             // 
+            this.nudTenderCount.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.nudTenderCount.Location = new System.Drawing.Point(200, 26);
             this.nudTenderCount.Minimum = new decimal(new int[] {
             10,
@@ -44,7 +46,7 @@ namespace SmartTenderWindow.Windows
             0,
             0});
             this.nudTenderCount.Name = "nudTenderCount";
-            this.nudTenderCount.Size = new System.Drawing.Size(157, 22);
+            this.nudTenderCount.Size = new System.Drawing.Size(345, 22);
             this.nudTenderCount.TabIndex = 0;
             this.nudTenderCount.Value = new decimal(new int[] {
             10,
@@ -63,6 +65,8 @@ namespace SmartTenderWindow.Windows
             // 
             // nudDocumentTotal
             // 
+            this.nudDocumentTotal.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.nudDocumentTotal.DecimalPlaces = 2;
             this.nudDocumentTotal.Location = new System.Drawing.Point(200, 66);
             this.nudDocumentTotal.Maximum = new decimal(new int[] {
@@ -76,7 +80,7 @@ namespace SmartTenderWindow.Windows
             0,
             131072});
             this.nudDocumentTotal.Name = "nudDocumentTotal";
-            this.nudDocumentTotal.Size = new System.Drawing.Size(157, 22);
+            this.nudDocumentTotal.Size = new System.Drawing.Size(345, 22);
             this.nudDocumentTotal.TabIndex = 1;
             this.nudDocumentTotal.Value = new decimal(new int[] {
             3750,
@@ -86,40 +90,48 @@ namespace SmartTenderWindow.Windows
             // 
             // btnOpenTender
             // 
+            this.btnOpenTender.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.btnOpenTender.Location = new System.Drawing.Point(27, 110);
             this.btnOpenTender.Name = "btnOpenTender";
-            this.btnOpenTender.Size = new System.Drawing.Size(330, 30);
+            this.btnOpenTender.Size = new System.Drawing.Size(518, 30);
             this.btnOpenTender.TabIndex = 2;
             this.btnOpenTender.Text = "Open Tender Window";
             this.btnOpenTender.UseVisualStyleBackColor = true;
             this.btnOpenTender.Click += new System.EventHandler(this.btnOpenTender_Click);
-            //
+            // 
             // button1
-            //
-            this.button1.Location = new System.Drawing.Point(27, 146);
+            // 
+            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.button1.Location = new System.Drawing.Point(36, 388);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(330, 30);
+            this.button1.Size = new System.Drawing.Size(518, 30);
             this.button1.TabIndex = 3;
             this.button1.Text = "Open Test Window";
             this.button1.UseVisualStyleBackColor = true;
+            this.button1.Visible = false;
             this.button1.Click += new System.EventHandler(this.button1_Click);
-            //
+            // 
             // txtJsonResult
-            //
-            this.txtJsonResult.Location = new System.Drawing.Point(24, 182);
+            // 
+            this.txtJsonResult.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtJsonResult.Location = new System.Drawing.Point(27, 146);
             this.txtJsonResult.Multiline = true;
             this.txtJsonResult.Name = "txtJsonResult";
             this.txtJsonResult.ReadOnly = true;
             this.txtJsonResult.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.txtJsonResult.Size = new System.Drawing.Size(330, 200);
+            this.txtJsonResult.Size = new System.Drawing.Size(518, 323);
             this.txtJsonResult.TabIndex = 4;
             this.txtJsonResult.WordWrap = false;
             // 
             // MainForm
-            //
+            // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(378, 420);
+            this.ClientSize = new System.Drawing.Size(566, 491);
             this.Controls.Add(this.txtJsonResult);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.lblTenderCount);
@@ -128,7 +140,6 @@ namespace SmartTenderWindow.Windows
             this.Controls.Add(this.nudDocumentTotal);
             this.Controls.Add(this.btnOpenTender);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
-            this.MaximizeBox = false;
             this.Name = "MainForm";
             this.ShowIcon = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;

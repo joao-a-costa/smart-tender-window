@@ -9,18 +9,14 @@ namespace SmartTenderWindowTenderSplit.Forms
 {
     public partial class TenderSplitDialog : Form
     {
-        // ── Palette ──────────────────────────────────────────────────────────
-        private static readonly Color ClrHeader   = Color.FromArgb(76, 175, 80);
-        private static readonly Color ClrSelected = Color.FromArgb(200, 230, 201);
-        private static readonly Color ClrError    = Color.FromArgb(211, 47, 47);
-        private static readonly Color ClrDisabled = Color.FromArgb(180, 180, 180);
-
         // ── Data ─────────────────────────────────────────────────────────────
         private readonly decimal _documentTotal;
         private readonly List<TenderItem> _tenders;
         private readonly decimal[] _amounts;
         private int    _selectedIndex = -1;
         private string _inputBuffer   = "0";
+        private Keys _confirmHotkey = Keys.F10;  // Keyboard shortcut to confirm (default F10)
+        private readonly TenderDialogColorScheme _colorScheme;
 
         // Per-tender extra details captured via popups. Holds a BankTransferDetails,
         // CheckDetails or CreditNoteRefundDetails, or null when none / not applicable.
@@ -32,7 +28,7 @@ namespace SmartTenderWindowTenderSplit.Forms
 
         // ── Constructor ──────────────────────────────────────────────────────
 
-        public TenderSplitDialog(IEnumerable<TenderItem> tenders, decimal documentTotal)
+        public TenderSplitDialog(IEnumerable<TenderItem> tenders, decimal documentTotal, Keys confirmHotkey = Keys.F10, TenderDialogColorScheme colorScheme = null)
         {
             if (tenders == null) throw new ArgumentNullException(nameof(tenders));
             if (documentTotal <= 0)
@@ -43,6 +39,8 @@ namespace SmartTenderWindowTenderSplit.Forms
                 throw new ArgumentException("A lista de meios de pagamento não pode estar vazia.", nameof(tenders));
 
             _documentTotal = documentTotal;
+            _confirmHotkey = confirmHotkey;
+            _colorScheme = colorScheme ?? new TenderDialogColorScheme();
             _amounts       = new decimal[_tenders.Count];
             _details       = new object[_tenders.Count];
             for (int i = 0; i < _tenders.Count; i++)
@@ -64,9 +62,11 @@ namespace SmartTenderWindowTenderSplit.Forms
             IWin32Window owner,
             IEnumerable<TenderItem> tenders,
             decimal documentTotal,
-            string title = null)
+            string title = null,
+            Keys confirmHotkey = Keys.F10,
+            TenderDialogColorScheme colorScheme = null)
         {
-            using (var dlg = new TenderSplitDialog(tenders, documentTotal))
+            using (var dlg = new TenderSplitDialog(tenders, documentTotal, confirmHotkey, colorScheme))
             {
                 if (title != null) dlg.Text = title;
                 return dlg.ShowDialog(owner) == DialogResult.OK ? dlg.Result : null;
@@ -97,13 +97,13 @@ namespace SmartTenderWindowTenderSplit.Forms
             dgvTenders.AllowUserToDeleteRows = false;  // Prevent accidental row deletion
 
             // Style header
-            dgvTenders.ColumnHeadersDefaultCellStyle.BackColor = ClrHeader;
-            dgvTenders.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
+            dgvTenders.ColumnHeadersDefaultCellStyle.BackColor = _colorScheme.HeaderBackColor;
+            dgvTenders.ColumnHeadersDefaultCellStyle.ForeColor = _colorScheme.HeaderTextColor;
             dgvTenders.ColumnHeadersDefaultCellStyle.Font = new Font(dgvTenders.Font, FontStyle.Bold);
 
             // Style alternating rows
-            dgvTenders.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(240, 240, 240);
-            dgvTenders.DefaultCellStyle.BackColor = Color.White;
+            dgvTenders.AlternatingRowsDefaultCellStyle.BackColor = _colorScheme.AlternatingRowColor;
+            dgvTenders.DefaultCellStyle.BackColor = _colorScheme.DefaultRowColor;
 
             dgvTenders.Rows.Clear();
             for (int i = 0; i < _tenders.Count; i++)
@@ -168,6 +168,16 @@ namespace SmartTenderWindowTenderSplit.Forms
 
         private void DgvTenders_KeyDown(object sender, KeyEventArgs e)
         {
+            // If not in edit mode, enter edit mode when user starts typing
+            bool isNumericKey = (e.KeyCode >= Keys.D0 && e.KeyCode <= Keys.D9) ||
+                                (e.KeyCode >= Keys.NumPad0 && e.KeyCode <= Keys.NumPad9);
+            if (isNumericKey && !dgvTenders.IsCurrentCellInEditMode)
+            {
+                dgvTenders.BeginEdit(true);
+                // Let the cell's TextBox handle the numeric key
+                return;
+            }
+
             if (e.KeyCode == Keys.Delete && dgvTenders.IsCurrentCellInEditMode)
             {
                 if (dgvTenders.EditingControl is TextBox textBox)
@@ -179,35 +189,35 @@ namespace SmartTenderWindowTenderSplit.Forms
                         e.SuppressKeyPress = true;
                     }
                 }
+                return;
             }
 
-            // Route number keys and special keys (Enter, Tab, Backspace) to the numpad handler
-            switch (e.KeyCode)
+            // Route number keys and special keys (Enter, Tab, Backspace) to the numpad handler only when NOT in edit mode
+            if (!dgvTenders.IsCurrentCellInEditMode)
             {
-                case Keys.D0: case Keys.NumPad0: HandleNumpad("0"); e.Handled = true; break;
-                case Keys.D1: case Keys.NumPad1: HandleNumpad("1"); e.Handled = true; break;
-                case Keys.D2: case Keys.NumPad2: HandleNumpad("2"); e.Handled = true; break;
-                case Keys.D3: case Keys.NumPad3: HandleNumpad("3"); e.Handled = true; break;
-                case Keys.D4: case Keys.NumPad4: HandleNumpad("4"); e.Handled = true; break;
-                case Keys.D5: case Keys.NumPad5: HandleNumpad("5"); e.Handled = true; break;
-                case Keys.D6: case Keys.NumPad6: HandleNumpad("6"); e.Handled = true; break;
-                case Keys.D7: case Keys.NumPad7: HandleNumpad("7"); e.Handled = true; break;
-                case Keys.D8: case Keys.NumPad8: HandleNumpad("8"); e.Handled = true; break;
-                case Keys.D9: case Keys.NumPad9: HandleNumpad("9"); e.Handled = true; break;
-                case Keys.Back: HandleNumpad("⌫"); e.Handled = true; break;
-                case Keys.Delete:
-                    // Only handle Delete as backspace if NOT in edit mode; let TextBox handle it in edit mode
-                    if (!dgvTenders.IsCurrentCellInEditMode)
-                    {
-                        HandleNumpad("⌫");
-                        e.Handled = true;
-                    }
-                    break;
-                case Keys.Up: NavigateTender(-1); e.Handled = true; break;  
-                case Keys.Down: NavigateTender(1); e.Handled = true; break;
-                //case Keys.Tab: FinalizeInputAndOpenDetailsIfNeeded(); e.Handled = true; break;
-                //case Keys.Enter: FinalizeInputAndOpenDetailsIfNeeded(); if (FirstMissingDetailIndex() < 0) Confirm(); e.Handled = true; break;
-                case Keys.Escape: btnCancel_Click(sender, e); e.Handled = true; break;
+                switch (e.KeyCode)
+                {
+                    case Keys.D0: case Keys.NumPad0: HandleNumpad("0"); e.Handled = true; break;
+                    case Keys.D1: case Keys.NumPad1: HandleNumpad("1"); e.Handled = true; break;
+                    case Keys.D2: case Keys.NumPad2: HandleNumpad("2"); e.Handled = true; break;
+                    case Keys.D3: case Keys.NumPad3: HandleNumpad("3"); e.Handled = true; break;
+                    case Keys.D4: case Keys.NumPad4: HandleNumpad("4"); e.Handled = true; break;
+                    case Keys.D5: case Keys.NumPad5: HandleNumpad("5"); e.Handled = true; break;
+                    case Keys.D6: case Keys.NumPad6: HandleNumpad("6"); e.Handled = true; break;
+                    case Keys.D7: case Keys.NumPad7: HandleNumpad("7"); e.Handled = true; break;
+                    case Keys.D8: case Keys.NumPad8: HandleNumpad("8"); e.Handled = true; break;
+                    case Keys.D9: case Keys.NumPad9: HandleNumpad("9"); e.Handled = true; break;
+                    case Keys.Back: HandleNumpad("⌫"); e.Handled = true; break;
+                    case Keys.Delete: HandleNumpad("⌫"); e.Handled = true; break;
+                    case Keys.Up: NavigateTender(-1); e.Handled = true; break;
+                    case Keys.Down: NavigateTender(1); e.Handled = true; break;
+                    case Keys.Escape: btnCancel_Click(sender, e); e.Handled = true; break;
+                }
+            }
+            else if (e.KeyCode == Keys.Escape)
+            {
+                btnCancel_Click(sender, e);
+                e.Handled = true;
             }
         }
 
@@ -283,7 +293,8 @@ namespace SmartTenderWindowTenderSplit.Forms
                         : "0";
                     break;
                 case ".":
-                    break; // 2 decimal places implied — ignore explicit dot
+                case ",":
+                    break; // 2 decimal places implied — ignore explicit dot/comma
                 default:
                     _inputBuffer = _inputBuffer == "0" ? key : _inputBuffer + key;
                     break;
@@ -413,22 +424,22 @@ namespace SmartTenderWindowTenderSplit.Forms
             if (fulfilled)
             {
                 lblMissingCaption.Text      = "Troco:";
-                lblMissingCaption.ForeColor = Color.ForestGreen;
+                lblMissingCaption.ForeColor = _colorScheme.SuccessTextColor;
                 lblMissingValue.Text        = FormatCurrency(-missing);
-                lblMissingValue.ForeColor   = Color.ForestGreen;
+                lblMissingValue.ForeColor   = _colorScheme.SuccessTextColor;
             }
             else
             {
                 lblMissingCaption.Text      = "Em falta:";
-                lblMissingCaption.ForeColor = ClrError;
+                lblMissingCaption.ForeColor = _colorScheme.ErrorTextColor;
                 lblMissingValue.Text        = FormatCurrency(missing);
-                lblMissingValue.ForeColor   = ClrError;
+                lblMissingValue.ForeColor   = _colorScheme.ErrorTextColor;
             }
 
             fulfilled = delivered == 0 || _documentTotal == delivered || delivered > _documentTotal;
 
             btnConfirm.Enabled   = fulfilled;
-            btnConfirm.BackColor = fulfilled ? ClrHeader : ClrDisabled;
+            btnConfirm.BackColor = fulfilled ? _colorScheme.SuccessColor : _colorScheme.DisabledColor;
         }
 
         // ── Confirm ──────────────────────────────────────────────────────────
@@ -561,7 +572,15 @@ namespace SmartTenderWindowTenderSplit.Forms
                     if (FirstMissingDetailIndex() < 0) Confirm();
                     break;
                 case Keys.Escape:  btnCancel_Click(sender, e); break;
-                default: return;
+                default:
+                    if (e.KeyCode == _confirmHotkey)
+                    {
+                        FinalizeInputAndOpenDetailsIfNeeded();
+                        if (FirstMissingDetailIndex() < 0) Confirm();
+                    }
+                    else
+                        return;
+                    break;
             }
             e.Handled = true;
         }
@@ -576,9 +595,23 @@ namespace SmartTenderWindowTenderSplit.Forms
             return raw == 0 ? "0" : raw.ToString();
         }
 
+        private bool isSettingCell = false;
+
+
         private void OpenDetailsForSelected(object sender, EventArgs e)
         {
             OpenDetailsForSelected();
+        }
+
+        private void dgvTenders_RowEnter(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0) return;
+
+            this.BeginInvoke(new Action(() =>
+            {
+                dgvTenders.CurrentCell = dgvTenders.Rows[e.RowIndex].Cells[1];
+                dgvTenders.BeginEdit(true);
+            }));
         }
     }
 }

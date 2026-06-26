@@ -71,6 +71,7 @@
     <Compile Include="Models\CheckDetails.cs" />
     <Compile Include="Models\CreditNoteRefundDetails.cs" />
     <Compile Include="Models\TenderAllocation.cs" />
+    <Compile Include="Models\TenderDialogColorScheme.cs" />
     <Compile Include="Models\TenderItem.cs" />
     <Compile Include="Models\TenderOption.cs" />
     <Compile Include="Models\TenderSplitResult.cs" />

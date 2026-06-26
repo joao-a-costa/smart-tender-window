@@ -49,8 +49,8 @@ namespace SmartTenderWindowTenderSplit.Forms
 
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle13 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle14 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
             this.panelHeader = new System.Windows.Forms.Panel();
             this.lblHeader = new System.Windows.Forms.Label();
             this.panelLeft = new System.Windows.Forms.Panel();
@@ -145,25 +145,29 @@ namespace SmartTenderWindowTenderSplit.Forms
             this.colAmount});
             this.dgvTenders.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dgvTenders.Location = new System.Drawing.Point(17, 36);
-            this.dgvTenders.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.dgvTenders.Margin = new System.Windows.Forms.Padding(4);
             this.dgvTenders.Name = "dgvTenders";
+            this.dgvTenders.RowHeadersWidth = 51;
             this.dgvTenders.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dgvTenders.Size = new System.Drawing.Size(427, 253);
             this.dgvTenders.TabIndex = 14;
+            this.dgvTenders.RowEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvTenders_RowEnter);
             // 
             // colTenderName
             // 
-            dataGridViewCellStyle13.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.colTenderName.DefaultCellStyle = dataGridViewCellStyle13;
+            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.colTenderName.DefaultCellStyle = dataGridViewCellStyle5;
             this.colTenderName.HeaderText = "Modalidade";
+            this.colTenderName.MinimumWidth = 6;
             this.colTenderName.Name = "colTenderName";
             this.colTenderName.ReadOnly = true;
             // 
             // colAmount
             // 
-            dataGridViewCellStyle14.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.colAmount.DefaultCellStyle = dataGridViewCellStyle14;
+            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.colAmount.DefaultCellStyle = dataGridViewCellStyle6;
             this.colAmount.HeaderText = "Valor (€)";
+            this.colAmount.MinimumWidth = 6;
             this.colAmount.Name = "colAmount";
             // 
             // panelLeftTopRight
@@ -171,7 +175,7 @@ namespace SmartTenderWindowTenderSplit.Forms
             this.panelLeftTopRight.BackColor = System.Drawing.Color.WhiteSmoke;
             this.panelLeftTopRight.Dock = System.Windows.Forms.DockStyle.Right;
             this.panelLeftTopRight.Location = new System.Drawing.Point(444, 36);
-            this.panelLeftTopRight.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.panelLeftTopRight.Margin = new System.Windows.Forms.Padding(4);
             this.panelLeftTopRight.Name = "panelLeftTopRight";
             this.panelLeftTopRight.Size = new System.Drawing.Size(17, 253);
             this.panelLeftTopRight.TabIndex = 18;
@@ -181,7 +185,7 @@ namespace SmartTenderWindowTenderSplit.Forms
             this.panelLeftTopLeft.BackColor = System.Drawing.Color.WhiteSmoke;
             this.panelLeftTopLeft.Dock = System.Windows.Forms.DockStyle.Left;
             this.panelLeftTopLeft.Location = new System.Drawing.Point(0, 36);
-            this.panelLeftTopLeft.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.panelLeftTopLeft.Margin = new System.Windows.Forms.Padding(4);
             this.panelLeftTopLeft.Name = "panelLeftTopLeft";
             this.panelLeftTopLeft.Size = new System.Drawing.Size(17, 253);
             this.panelLeftTopLeft.TabIndex = 17;
@@ -191,7 +195,7 @@ namespace SmartTenderWindowTenderSplit.Forms
             this.panelLeftTopTop.BackColor = System.Drawing.Color.WhiteSmoke;
             this.panelLeftTopTop.Dock = System.Windows.Forms.DockStyle.Top;
             this.panelLeftTopTop.Location = new System.Drawing.Point(0, 0);
-            this.panelLeftTopTop.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.panelLeftTopTop.Margin = new System.Windows.Forms.Padding(4);
             this.panelLeftTopTop.Name = "panelLeftTopTop";
             this.panelLeftTopTop.Size = new System.Drawing.Size(461, 36);
             this.panelLeftTopTop.TabIndex = 16;
@@ -204,7 +208,7 @@ namespace SmartTenderWindowTenderSplit.Forms
             this.panelLeftTopBottom.Controls.Add(this.btnDetails);
             this.panelLeftTopBottom.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.panelLeftTopBottom.Location = new System.Drawing.Point(0, 289);
-            this.panelLeftTopBottom.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.panelLeftTopBottom.Margin = new System.Windows.Forms.Padding(4);
             this.panelLeftTopBottom.Name = "panelLeftTopBottom";
             this.panelLeftTopBottom.Size = new System.Drawing.Size(461, 57);
             this.panelLeftTopBottom.TabIndex = 15;
@@ -308,7 +312,7 @@ namespace SmartTenderWindowTenderSplit.Forms
             this.lblTotalCaption.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Bold);
             this.lblTotalCaption.Location = new System.Drawing.Point(11, 89);
             this.lblTotalCaption.Name = "lblTotalCaption";
-            this.lblTotalCaption.Size = new System.Drawing.Size(43, 17);
+            this.lblTotalCaption.Size = new System.Drawing.Size(52, 21);
             this.lblTotalCaption.TabIndex = 8;
             this.lblTotalCaption.Text = "Total:";
             // 
@@ -332,7 +336,7 @@ namespace SmartTenderWindowTenderSplit.Forms
             this.lblMissingCaption.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(211)))), ((int)(((byte)(47)))), ((int)(((byte)(47)))));
             this.lblMissingCaption.Location = new System.Drawing.Point(12, 58);
             this.lblMissingCaption.Name = "lblMissingCaption";
-            this.lblMissingCaption.Size = new System.Drawing.Size(63, 17);
+            this.lblMissingCaption.Size = new System.Drawing.Size(77, 21);
             this.lblMissingCaption.TabIndex = 6;
             this.lblMissingCaption.Text = "Em falta:";
             // 
@@ -375,7 +379,7 @@ namespace SmartTenderWindowTenderSplit.Forms
             this.lblDeliveredCaption.Font = new System.Drawing.Font("Segoe UI", 9.5F);
             this.lblDeliveredCaption.Location = new System.Drawing.Point(12, 30);
             this.lblDeliveredCaption.Name = "lblDeliveredCaption";
-            this.lblDeliveredCaption.Size = new System.Drawing.Size(97, 17);
+            this.lblDeliveredCaption.Size = new System.Drawing.Size(115, 21);
             this.lblDeliveredCaption.TabIndex = 4;
             this.lblDeliveredCaption.Text = "Valor entregue:";
             // 
